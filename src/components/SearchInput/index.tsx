@@ -1,11 +1,5 @@
-import React, { ReactElement, useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  TextInputProps,
-  Image,
-  Animated,
-} from 'react-native';
+import React, { ReactElement } from 'react';
+import { StyleSheet, TextInputProps, Animated } from 'react-native';
 import colors from '../../colors';
 import { TextInput } from 'react-native-gesture-handler';
 
