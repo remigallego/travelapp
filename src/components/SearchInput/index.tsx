@@ -2,12 +2,20 @@ import React, { ReactElement } from 'react';
 import { StyleSheet, TextInputProps, Animated } from 'react-native';
 import colors from '../../colors';
 import { TextInput } from 'react-native-gesture-handler';
+import { useAnimation } from 'react-native-animation-hooks';
 
 interface Props extends TextInputProps {}
 
 const SearchInput: (props: Props) => ReactElement = props => {
   const valueIsEmpty =
     props.value === null || props.value === '' || props.value === undefined;
+
+  const colorAnimation = useAnimation({
+    type: 'timing',
+    initialValue: 0,
+    toValue: valueIsEmpty ? 0 : 100,
+    duration: 200,
+  });
 
   return (
     <Animated.View style={[styles.searchInput, props.style]}>
@@ -16,7 +24,11 @@ const SearchInput: (props: Props) => ReactElement = props => {
         style={[
           styles.image,
           {
-            tintColor: valueIsEmpty ? colors.darkerGrey : colors.blue,
+            // Doesn't work with the debugger on
+            tintColor: colorAnimation.interpolate({
+              inputRange: [0, 100],
+              outputRange: [colors.darkerGrey, colors.blue],
+            }),
           },
         ]}
       />
@@ -51,7 +63,6 @@ const styles = StyleSheet.create({
     width: 2,
     resizeMode: 'stretch',
     alignItems: 'center',
-    tintColor: colors.blue,
   },
   textInput: {
     flex: 1,

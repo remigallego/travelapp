@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^1.2.3",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-animation-hooks": "^1.0.1",
     "react-native-gesture-handler": "^1.5.3",
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.6.2",
@@ -22,10 +23,10 @@
     "typescript": "^3.7.5"
   },
   "devDependencies": {
-    "@react-native-community/masked-view": "^0.1.6",
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
     "@react-native-community/eslint-config": "^0.0.5",
+    "@react-native-community/masked-view": "^0.1.6",
     "@types/jest": "^24.9.0",
     "@types/react": "^16.9.17",
     "@types/react-native": "^0.61.0",
