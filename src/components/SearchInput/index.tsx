@@ -18,7 +18,7 @@ const SearchInput: (props: Props) => ReactElement = props => {
   });
 
   return (
-    <Animated.View style={[styles.searchInput, props.style]}>
+    <Animated.View style={[styles.searchInput, styles.dropShadow, props.style]}>
       <Animated.Image
         source={require('./glass.png')}
         style={[
@@ -71,5 +71,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     paddingTop: 10,
     fontSize: 14,
+  },
+  dropShadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.36,
+    shadowRadius: 6.68,
+    elevation: 11,
   },
 });

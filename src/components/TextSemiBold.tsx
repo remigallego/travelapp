@@ -6,16 +6,18 @@ interface Props extends TextProps {
   children: string | ReactElement | ReactElement[];
 }
 
-const TextBold: (props: Props) => ReactElement = props => {
+const TextSemiBold: (props: Props) => ReactElement = props => {
   return (
-    <TextLight style={[styles.bold, props.style]}>{props.children}</TextLight>
+    <TextLight style={[styles.semiBold, props.style]}>
+      {props.children}
+    </TextLight>
   );
 };
 
-export default TextBold;
+export default TextSemiBold;
 
 const styles = StyleSheet.create({
-  bold: {
-    fontFamily: 'Poppins-Bold',
+  semiBold: {
+    fontFamily: 'Poppins-SemiBold',
   },
 });

@@ -9,7 +9,6 @@ const AppContainer = createAppContainer(AppNavigator);
 const App: () => ReactElement = () => {
   return (
     <>
-      <StatusBar backgroundColor={colors.pink} barStyle={'light-content'} />
       <AppContainer />
     </>
   );

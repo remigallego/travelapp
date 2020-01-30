@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import TextRegular from '../TextRegular';
+import TextLight from '../TextLight';
 import colors from '../../colors';
 
 interface Props {
@@ -16,7 +16,7 @@ const AutoComplete: (props: Props) => ReactElement = props => {
       <TouchableOpacity
         style={styles.itemContainer}
         onPress={() => onPressItem(val)}>
-        <TextRegular style={[styles.itemText]}>{val}</TextRegular>
+        <TextLight style={[styles.itemText]}>{val}</TextLight>
       </TouchableOpacity>
     );
   };

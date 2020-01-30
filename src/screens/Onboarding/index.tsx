@@ -1,24 +1,34 @@
 import React, { ReactElement, useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import colors from '../colors';
-import TextRegular from '../components/TextRegular';
-import TextBold from '../components/TextBold';
-import SearchInput from '../components/SearchInput';
+import { StyleSheet, View, Image, StatusBar } from 'react-native';
+import colors from '../../colors';
+import TextLight from '../../components/TextLight';
+import TextBold from '../../components/TextBold';
+import SearchInput from '../../components/SearchInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AutoComplete from '../components/AutoComplete';
+import AutoComplete from '../../components/AutoComplete';
+import {
+  NavigationScreenProp,
+  NavigationState,
+  NavigationParams,
+} from 'react-navigation';
 
-const Home: () => ReactElement = () => {
+interface Props {
+  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+}
+
+const Onboarding: (props: Props) => ReactElement = props => {
   const [searchValue, setSearchValue] = useState();
   return (
     <SafeAreaView style={styles.screen}>
+      <StatusBar backgroundColor={colors.pink} barStyle={'light-content'} />
       <View style={styles.container}>
-        <TextRegular>
-          <TextRegular>Where are you </TextRegular>
-        </TextRegular>
-        <TextRegular>
+        <TextLight>
+          <TextLight>Where are you </TextLight>
+        </TextLight>
+        <TextLight>
           <TextBold>flying </TextBold>
-          <TextRegular>to?</TextRegular>
-        </TextRegular>
+          <TextLight>to?</TextLight>
+        </TextLight>
 
         <View>
           <SearchInput
@@ -29,17 +39,17 @@ const Home: () => ReactElement = () => {
           />
           <AutoComplete
             values={searchValue ? ['Berlin', 'Paris', 'New York'] : []}
-            onPressItem={val => console.log(val)}
+            onPressItem={() => props.navigation.navigate('Calendar')}
           />
         </View>
       </View>
 
-      <Image source={require('./background.png')} style={styles.imageStyle} />
+      <Image source={require('./background.jpeg')} style={styles.imageStyle} />
     </SafeAreaView>
   );
 };
 
-export default Home;
+export default Onboarding;
 
 const styles = StyleSheet.create({
   screen: {
@@ -63,7 +73,6 @@ const styles = StyleSheet.create({
   imageStyle: {
     position: 'absolute',
     zIndex: -1,
-    top: 200,
     width: '100%',
     height: '100%',
   },

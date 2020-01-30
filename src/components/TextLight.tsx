@@ -6,11 +6,11 @@ interface Props extends TextProps {
   children: string | ReactElement | ReactElement[];
 }
 
-const TextRegular: (props: Props) => ReactElement = props => {
+const TextLight: (props: Props) => ReactElement = props => {
   return <Text style={[styles.text, props.style]}>{props.children}</Text>;
 };
 
-export default TextRegular;
+export default TextLight;
 
 const styles = StyleSheet.create({
   text: {
