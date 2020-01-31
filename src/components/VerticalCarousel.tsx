@@ -9,39 +9,30 @@ import {
 import colors from '../colors';
 import Card from './Card';
 import TextSemiBold from './TextSemiBold';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
-interface Props extends TextProps {}
+interface Props extends TextProps {
+  months: moment.Moment[];
+}
 
 const VerticalCarousel: (props: Props) => ReactElement = props => {
-  const [selectedDate, selectDate] = useState(moment().format("MMMM'YY"));
+  const [selectedMonth, selectMonth] = useState(moment().month());
 
-  const generateNextDates = () => {
-    const result = [];
-    for (let i = 0; i <= 12; i++) {
-      const newMonth = moment()
-        .add(i, 'month')
-        .format("MMMM'YY");
-      result.push(newMonth);
-    }
-    return result;
-  };
-
-  const getDynamicStyle = (date: string) => {
+  const getDynamicStyle = (date: moment.Moment) => {
     return {
-      lineHeight: selectedDate === date ? 24 : 18,
-      fontSize: selectedDate === date ? 30 : 24,
-      opacity: selectedDate === date ? 1 : 0.4,
+      lineHeight: selectedMonth === date.month() ? 24 : 18,
+      fontSize: selectedMonth === date.month() ? 30 : 24,
+      opacity: selectedMonth === date.month() ? 1 : 0.4,
     };
   };
 
-  const dates = generateNextDates();
-
-  const renderDate = (date: string) => {
+  const renderDate = (date: moment.Moment) => {
     return (
-      <TouchableOpacity key={date} onPress={() => selectDate(date)}>
+      <TouchableOpacity
+        key={date.format("MMMM'YY")}
+        onPress={() => selectMonth(date.month())}>
         <TextSemiBold style={[{ color: colors.blue }, getDynamicStyle(date)]}>
-          {`${date}`}
+          {`${date.format("MMMM'YY")}`}
         </TextSemiBold>
       </TouchableOpacity>
     );
@@ -51,9 +42,11 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
     <Card style={[styles.card, props.style]}>
       <ScrollView
         style={styles.scrollView}
-        showsHorizontalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}>
         <View style={styles.flexContainer}>
-          {dates.map(date => renderDate(date))}
+          {props.months.map(date => {
+            return renderDate(date);
+          })}
         </View>
       </ScrollView>
     </Card>
