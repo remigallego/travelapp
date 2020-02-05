@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { StyleSheet, View, StatusBar, ScrollView } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
@@ -21,6 +21,8 @@ interface Props {
 }
 
 const Calendar: (props: Props) => ReactElement = () => {
+  const [selectedMonth, selectMonth] = useState(moment().month());
+
   const generateNextDates = () => {
     const result = [];
     for (let i = 0; i <= 12; i++) {
@@ -31,42 +33,44 @@ const Calendar: (props: Props) => ReactElement = () => {
       );
     }
     return result;
+    c;
   };
 
   const months = generateNextDates();
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <SafeAreaView style={styles.screen}>
-        <StatusBar
-          backgroundColor={colors.backgroundBlue}
-          barStyle={'dark-content'}
+    <SafeAreaView style={styles.screen}>
+      <StatusBar
+        backgroundColor={colors.backgroundBlue}
+        barStyle={'dark-content'}
+      />
+
+      <View style={styles.container}>
+        <TextSemiBold style={[styles.blackText, styles.bigText]}>
+          Venice, VCE
+        </TextSemiBold>
+
+        <Card style={styles.smallMarginTop}>
+          <TextMedium style={[styles.blackText, styles.smallText]}>
+            1 passenger, business
+          </TextMedium>
+        </Card>
+
+        <VerticalCarousel
+          style={styles.smallMarginTop}
+          months={months}
+          selectMonth={selectMonth}
+          selectedMonth={selectedMonth}
         />
 
-        <View style={styles.container}>
-          <TextLight>
-            <TextSemiBold style={styles.blackText}>Venice, VCE</TextSemiBold>
-          </TextLight>
+        <CalendarComponent
+          style={styles.smallMarginTop}
+          month={selectedMonth}
+        />
 
-          <Card style={styles.smallMarginTop}>
-            <TextMedium style={[styles.blackText, { fontSize: 18 }]}>
-              1 passenger, business
-            </TextMedium>
-          </Card>
-
-          <VerticalCarousel style={styles.smallMarginTop} months={months} />
-
-          <CalendarComponent
-            style={[styles.smallMarginTop]}
-            month={moment().date(1)}
-          />
-
-          <ButtonComponent style={styles.smallMarginTop}>
-            Search
-          </ButtonComponent>
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+        <ButtonComponent style={styles.smallMarginTop}>Search</ButtonComponent>
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -77,12 +81,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.backgroundBlue,
   },
+  bigText: {
+    fontSize: 30, // TODO: Should be responsive
+  },
+  smallText: { fontSize: 18 },
   blackText: { color: colors.black },
   container: {
-    paddingTop: 30,
+    paddingVertical: 20,
     paddingHorizontal: 20,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    height: '100%',
   },
   smallMarginTop: {
-    marginTop: 30,
+    marginTop: 0,
   },
 });

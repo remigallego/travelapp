@@ -27,17 +27,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   container: {
-    width: '80%',
+    width: '50%',
     backgroundColor: colors.pink,
     borderRadius: 40,
-    paddingTop: 15,
-    paddingBottom: 15,
+    paddingBottom: 10,
     paddingHorizontal: 30,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
-    fontSize: 28,
+    fontSize: 22,
   },
 });

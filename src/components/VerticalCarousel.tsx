@@ -13,10 +13,12 @@ import moment, { Moment } from 'moment';
 
 interface Props extends TextProps {
   months: moment.Moment[];
+  selectedMonth: number;
+  selectMonth: (m: number) => void;
 }
 
 const VerticalCarousel: (props: Props) => ReactElement = props => {
-  const [selectedMonth, selectMonth] = useState(moment().month());
+  const { selectedMonth, selectMonth } = props;
 
   const getDynamicStyle = (date: moment.Moment) => {
     return {

@@ -67,9 +67,9 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     color: colors.blue,
-    marginTop: 9,
+    marginTop: 3,
     fontFamily: 'Poppins-Medium',
-    paddingTop: 10,
+    paddingTop: 0,
     fontSize: 14,
   },
   dropShadow: {

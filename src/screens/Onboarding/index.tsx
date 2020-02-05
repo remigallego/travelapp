@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
   },
   imageStyle: {
     position: 'absolute',
+    bottom: 0,
     zIndex: -1,
     width: '100%',
     height: '100%',
