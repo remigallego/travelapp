@@ -7,7 +7,11 @@ interface Props extends ViewProps {
 }
 
 const Card: (props: Props) => ReactElement = props => {
-  return <View style={[styles.card, props.style]}>{props.children}</View>;
+  return (
+    <View style={[styles.card, props.style]} onLayout={props.onLayout}>
+      {props.children}
+    </View>
+  );
 };
 
 export default Card;

@@ -1,6 +1,7 @@
 import Onboarding from './screens/Onboarding';
 import { createStackNavigator } from 'react-navigation-stack';
 import Calendar from './screens/Calendar';
+import Results from './screens/Results';
 
 const AppNavigator = createStackNavigator({
   Onboarding: {
@@ -11,6 +12,12 @@ const AppNavigator = createStackNavigator({
   },
   Calendar: {
     screen: Calendar,
+    navigationOptions: {
+      header: () => null,
+    },
+  },
+  Results: {
+    screen: Results,
     navigationOptions: {
       header: () => null,
     },

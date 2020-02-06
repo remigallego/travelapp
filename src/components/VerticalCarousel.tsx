@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -43,6 +43,7 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
   return (
     <Card style={[styles.card, props.style]}>
       <ScrollView
+        scrollEventThrottle={10}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}>
         <View style={styles.flexContainer}>

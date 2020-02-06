@@ -1,19 +1,25 @@
 import React, { ReactElement } from 'react';
-import { StyleSheet, ViewProps, View } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  TouchableOpacityProps,
+} from 'react-native';
 import colors from '../colors';
 import TextSemiBold from './TextSemiBold';
 
-interface Props extends ViewProps {
+interface Props extends TouchableOpacityProps {
   children: string | ReactElement | ReactElement[];
 }
 
 const ButtonComponent: (props: Props) => ReactElement = props => {
+  const { children, style, ...otherProps } = props;
   return (
-    <View style={[styles.flexContainer, props.style]}>
+    <TouchableOpacity style={[styles.flexContainer, style]} {...otherProps}>
       <View style={styles.container}>
-        <TextSemiBold style={styles.text}>{props.children}</TextSemiBold>
+        <TextSemiBold style={styles.text}>{children}</TextSemiBold>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

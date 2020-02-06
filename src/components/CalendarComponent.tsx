@@ -1,10 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {
-  ReactElement,
-  useState,
-  useEffect,
-  useLayoutEffect,
-} from 'react';
+import React, { ReactElement, useState, useLayoutEffect } from 'react';
 import {
   StyleSheet,
   ViewProps,
@@ -80,7 +75,7 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
             </View>
             <View
               style={[
-                isFrom && isTo && styles.absoluteBackgroundColor,
+                isFrom && isTo ? styles.absoluteBackgroundColor : {},
                 number === isFrom && { right: 0 },
                 number === isTo && { left: 0 },
               ]}
@@ -113,9 +108,11 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
               <View
                 style={[
                   styles.alignCenter,
-                  isInRange(number) && {
-                    backgroundColor: 'rgba(35, 61, 189, 0.2)',
-                  },
+                  isInRange(number)
+                    ? {
+                        backgroundColor: 'rgba(35, 61, 189, 0.2)',
+                      }
+                    : {},
                 ]}>
                 <View style={[styles.numberContainer]}>
                   <Text key={number} style={styles.numberText}>
@@ -167,7 +164,7 @@ const styles = StyleSheet.create({
     height: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   item: {
     width: `${100 / 7}%`,

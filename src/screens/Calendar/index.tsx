@@ -1,9 +1,7 @@
 import React, { ReactElement, useState } from 'react';
-import { StyleSheet, View, StatusBar, ScrollView } from 'react-native';
+import { StyleSheet, View, StatusBar } from 'react-native';
 import colors from '../../colors';
-import TextLight from '../../components/TextLight';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TextSemiBold from '../../components/TextSemiBold';
 import Card from '../../components/Card';
 import TextMedium from '../../components/TextMedium';
 import CalendarComponent from '../../components/CalendarComponent';
@@ -14,14 +12,19 @@ import {
   NavigationParams,
 } from 'react-navigation';
 import VerticalCarousel from '../../components/VerticalCarousel';
+import Headline from '../../components/Headline';
 import moment from 'moment';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
-const Calendar: (props: Props) => ReactElement = () => {
-  const [selectedMonth, selectMonth] = useState(moment().month());
+const Calendar: (props: Props) => ReactElement = props => {
+  const [selectedMonth, selectMonth] = useState(
+    moment()
+      .add('1', 'month')
+      .month(),
+  );
 
   const generateNextDates = () => {
     const result = [];
@@ -33,7 +36,6 @@ const Calendar: (props: Props) => ReactElement = () => {
       );
     }
     return result;
-    c;
   };
 
   const months = generateNextDates();
@@ -46,9 +48,7 @@ const Calendar: (props: Props) => ReactElement = () => {
       />
 
       <View style={styles.container}>
-        <TextSemiBold style={[styles.blackText, styles.bigText]}>
-          Venice, VCE
-        </TextSemiBold>
+        <Headline>Venice, VCE</Headline>
 
         <Card style={styles.smallMarginTop}>
           <TextMedium style={[styles.blackText, styles.smallText]}>
@@ -68,7 +68,11 @@ const Calendar: (props: Props) => ReactElement = () => {
           month={selectedMonth}
         />
 
-        <ButtonComponent style={styles.smallMarginTop}>Search</ButtonComponent>
+        <ButtonComponent
+          style={styles.smallMarginTop}
+          onPress={() => props.navigation.navigate('Results')}>
+          Search
+        </ButtonComponent>
       </View>
     </SafeAreaView>
   );
