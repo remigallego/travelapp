@@ -14,6 +14,7 @@ const AutoComplete: (props: Props) => ReactElement = props => {
   const renderItem = (val: string) => {
     return (
       <TouchableOpacity
+        key={val}
         style={styles.itemContainer}
         onPress={() => onPressItem(val)}>
         <TextLight style={[styles.itemText]}>{val}</TextLight>

@@ -2,7 +2,6 @@ import React, { ReactElement, useState } from 'react';
 import { StyleSheet, View, StatusBar } from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import ButtonComponent from '../../components/ButtonComponent';
 import {
   NavigationScreenProp,
   NavigationState,
@@ -74,9 +73,6 @@ const Results: (props: Props) => ReactElement = () => {
               badgeTextColor={'#89D66F'}
             />
           </View>
-          <ButtonComponent style={styles.smallMarginTop}>
-            Search
-          </ButtonComponent>
         </View>
       </SafeAreaView>
     </ScrollView>

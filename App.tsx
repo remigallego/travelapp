@@ -1,12 +1,28 @@
 import React, { ReactElement } from 'react';
 import { createAppContainer } from 'react-navigation';
 import AppNavigator from './src/AppNavigator';
-import { StatusBar } from 'react-native';
-import colors from './src/colors';
 
 const AppContainer = createAppContainer(AppNavigator);
 
 const App: () => ReactElement = () => {
+  global.XMLHttpRequest = global.originalXMLHttpRequest
+    ? global.originalXMLHttpRequest
+    : global.XMLHttpRequest;
+  global.FormData = global.originalFormData
+    ? global.originalFormData
+    : global.FormData;
+
+  fetch;
+
+  if (window.__FETCH_SUPPORT__) {
+    window.__FETCH_SUPPORT__.blob = false;
+  } else {
+    global.Blob = global.originalBlob ? global.originalBlob : global.Blob;
+    global.FileReader = global.originalFileReader
+      ? global.originalFileReader
+      : global.FileReader;
+  }
+
   return (
     <>
       <AppContainer />

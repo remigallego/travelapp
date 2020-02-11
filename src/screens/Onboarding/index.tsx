@@ -1,5 +1,5 @@
 import React, { ReactElement, useState } from 'react';
-import { StyleSheet, View, Image, StatusBar } from 'react-native';
+import { StyleSheet, View, Image, StatusBar, Text } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
 import TextBold from '../../components/TextBold';
@@ -11,13 +11,32 @@ import {
   NavigationState,
   NavigationParams,
 } from 'react-navigation';
+import _ from 'lodash';
+import useSearchStore from '../../stores/search';
+import TextMedium from '../../components/TextMedium';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
 const Onboarding: (props: Props) => ReactElement = props => {
-  const [searchValue, setSearchValue] = useState();
+  const [query, loading, setQuery, setPlaces] = useSearchStore(state => [
+    state.query,
+    state.loading,
+    state.setQuery,
+    state.setPlaces,
+  ]);
+
+  const setPlacesDebounced = _.debounce(
+    () => {
+      setPlaces();
+    },
+    1000,
+    { trailing: true, leading: true },
+  );
+
+  const places = useSearchStore(state => state.places, console.log);
+
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar backgroundColor={colors.pink} barStyle={'light-content'} />
@@ -30,15 +49,20 @@ const Onboarding: (props: Props) => ReactElement = props => {
           <TextLight>to?</TextLight>
         </TextLight>
 
+        {loading && <TextMedium>Loading</TextMedium>}
+
         <View>
           <SearchInput
             style={styles.searchInputStyle}
             placeholder={'Search a flight'}
-            value={searchValue}
-            onChangeText={val => setSearchValue(val)}
+            value={query}
+            onChangeText={val => {
+              setQuery(val);
+              setPlacesDebounced();
+            }}
           />
           <AutoComplete
-            values={searchValue ? ['Berlin', 'Paris', 'New York'] : []}
+            values={places.map(pl => `${pl.PlaceName} ${pl.PlaceId}`)}
             onPressItem={() => props.navigation.navigate('Calendar')}
           />
         </View>
