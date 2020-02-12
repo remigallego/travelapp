@@ -14,6 +14,10 @@ import moment from 'moment';
 
 interface Props extends ViewProps {
   month: number;
+  inbound: Date;
+  outbound: Date;
+  onInboundSelect: (inbound: Date) => void;
+  onOutboundSelect: (outbound: Date) => void;
 }
 
 const CalendarComponent: (props: Props) => ReactElement = props => {

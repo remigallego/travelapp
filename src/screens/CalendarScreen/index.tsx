@@ -14,12 +14,16 @@ import {
 import VerticalCarousel from '../../components/VerticalCarousel';
 import Headline from '../../components/Headline';
 import moment from 'moment';
+import { useSelector } from '../../store';
+import { formatPlaceId } from '../../utils/places';
+import { useDispatch } from 'react-redux';
+import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
-const Calendar: (props: Props) => ReactElement = props => {
+const CalendarScreen: (props: Props) => ReactElement = props => {
   const [selectedMonth, selectMonth] = useState(
     moment()
       .add('1', 'month')
@@ -40,6 +44,12 @@ const Calendar: (props: Props) => ReactElement = props => {
 
   const months = generateNextDates();
 
+  const origin = useSelector(state => state.search.origin);
+  const destination = useSelector(state => state.search.destination);
+  const inbound = useSelector(state => state.calendar.inboundDate);
+  const outbound = useSelector(state => state.calendar.outboundDate);
+
+  const dispatch = useDispatch();
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar
@@ -48,7 +58,11 @@ const Calendar: (props: Props) => ReactElement = props => {
       />
 
       <View style={styles.container}>
-        <Headline>Venice, VCE</Headline>
+        <View style={{ flexDirection: 'row' }}>
+          <Headline>{`${formatPlaceId(origin)} - ${formatPlaceId(
+            destination,
+          )}`}</Headline>
+        </View>
 
         <Card style={styles.smallMarginTop}>
           <TextMedium style={[styles.blackText, styles.smallText]}>
@@ -66,6 +80,10 @@ const Calendar: (props: Props) => ReactElement = props => {
         <CalendarComponent
           style={styles.smallMarginTop}
           month={selectedMonth}
+          inbound={inbound}
+          outbound={outbound}
+          onInboundSelect={v => dispatch(setInboundDate(v))}
+          onOutboundSelect={v => dispatch(setOutboundDate(v))}
         />
 
         <ButtonComponent
@@ -78,7 +96,7 @@ const Calendar: (props: Props) => ReactElement = props => {
   );
 };
 
-export default Calendar;
+export default CalendarScreen;
 
 const styles = StyleSheet.create({
   screen: {

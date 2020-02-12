@@ -34,6 +34,7 @@ const SearchInput: (props: Props) => ReactElement = props => {
       />
       <TextInput
         {...props}
+        selectTextOnFocus
         style={styles.textInput}
         clearTextOnFocus={true}
         placeholderTextColor={colors.darkerGrey}
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     color: colors.blue,
-    marginTop: 3,
+    marginTop: 14,
     fontFamily: 'Poppins-Medium',
     paddingTop: 0,
     fontSize: 14,

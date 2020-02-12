@@ -12,12 +12,13 @@ import HorizontalCarousel from '../../components/HorizontalCarousel';
 import moment from 'moment';
 import { ScrollView } from 'react-native-gesture-handler';
 import FlightCard from './FlightCard';
+import Backend from '../../Backend';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
-const Results: (props: Props) => ReactElement = () => {
+const ResultsScreen: (props: Props) => ReactElement = () => {
   const [selectedDay, selectDay] = useState(moment());
 
   const generateDays = () => {
@@ -30,6 +31,12 @@ const Results: (props: Props) => ReactElement = () => {
       moment().add('5', 'day'),
     ];
   };
+
+  Backend.getQuotes({
+    destinationPlace: 'JFK-sky',
+    originPlace: 'SFO-sky',
+    outboundDate: '2020-09-01',
+  }).then(result => console.log(result));
 
   return (
     <ScrollView>
@@ -79,7 +86,7 @@ const Results: (props: Props) => ReactElement = () => {
   );
 };
 
-export default Results;
+export default ResultsScreen;
 
 const styles = StyleSheet.create({
   screen: {
