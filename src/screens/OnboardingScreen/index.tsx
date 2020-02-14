@@ -1,27 +1,37 @@
 import React, { ReactElement } from 'react';
-import { StyleSheet, View, Image, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  StatusBar,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
 import TextBold from '../../components/TextBold';
 import SearchInput from '../../components/SearchInput';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AutoComplete from '../../components/AutoComplete';
+import AutoCompletePlaces from '../../components/AutoCompletePlaces';
 import {
   NavigationScreenProp,
   NavigationState,
   NavigationParams,
 } from 'react-navigation';
 import {
-  setOriginQuery,
-  setDestinationQuery,
-  setDestinationPlaces,
-  setOriginPlaces,
-  setDestination,
-  setOrigin,
-} from '../../reducers/search';
+  setOnboardingOriginQuery,
+  setOnboardingDestinationQuery,
+  setOnboardingDestinationPlaces,
+  setOnboardingOriginPlaces,
+  setOnboardingDestination,
+  setOnboardingOrigin,
+  resetOnboardingDestinationPlaces,
+  resetOnboardingOriginPlaces,
+} from '../../reducers/onboardingSearch';
 import { useDispatch } from 'react-redux';
 import { useSelector } from '../../store';
 import { formatPlaceIdAndName } from '../../utils/places';
+import { setDestination, setOrigin } from '../../reducers/query';
+import { Place } from '../../Backend/types';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -29,41 +39,36 @@ interface Props {
 
 const OnboardingScreen: (props: Props) => ReactElement = props => {
   const dispatch = useDispatch();
-  const {
-    origin,
-    destination,
-    originQuery,
-    destinationQuery,
-    originPlaces,
-    destinationPlaces,
-    originLoading,
-    destinationLoading,
-  } = useSelector(state => state.search);
+  const { origin, destination } = useSelector(state => state.onboardingSearch);
 
   const renderOriginInput = () => {
     return (
       <View style={styles.originContainer}>
         <SearchInput
           style={styles.searchInputStyle}
+          loading={origin.loading}
+          onFocus={() => {
+            if (destination.places) {
+              dispatch(resetOnboardingDestinationPlaces());
+            }
+          }}
           placeholder={'Origin'}
-          value={origin ? formatPlaceIdAndName(origin) : originQuery}
+          value={
+            origin.value ? formatPlaceIdAndName(origin.value) : origin.query
+          }
           onChangeText={val => {
-            dispatch(setOriginQuery(val));
-            dispatch(setOriginPlaces()); // TODO: Figure out throttle/debounce
+            dispatch(setOnboardingOriginQuery(val));
+            dispatch(setOnboardingOriginPlaces()); // TODO: Figure out throttle/debounce
           }}
         />
-        <AutoComplete
-          values={originPlaces.slice(0, 5).map(formatPlaceIdAndName)}
-          loading={originLoading}
+        <AutoCompletePlaces
+          query={origin.query}
+          values={origin.places}
+          loading={origin.loading}
           onPressItem={val => {
-            const origin = originPlaces.find(
-              pl => formatPlaceIdAndName(pl) === val,
-            );
-            if (origin) {
-              dispatch(setOrigin(origin));
-              if (destination) {
-                props.navigation.navigate('Calendar');
-              }
+            dispatch(setOnboardingOrigin(val));
+            if (destination.value) {
+              validateAndNavigateToNextScreen(val, destination.value);
             }
           }}
         />
@@ -71,32 +76,40 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     );
   };
 
+  const validateAndNavigateToNextScreen = (
+    originValue: Place,
+    destinationValue: Place,
+  ) => {
+    dispatch(setOrigin(originValue));
+    dispatch(setDestination(destinationValue));
+    props.navigation.navigate('Calendar');
+  };
+
   const renderDestinationInput = () => {
     return (
       <View style={styles.destinationContainer}>
         <SearchInput
+          loading={destination.loading}
           style={styles.searchInputStyle}
           placeholder={'Destination'}
           value={
-            destination ? formatPlaceIdAndName(destination) : destinationQuery
+            destination.value
+              ? formatPlaceIdAndName(destination.value)
+              : destination.query
           }
           onChangeText={val => {
-            dispatch(setDestinationQuery(val));
-            dispatch(setDestinationPlaces()); // TODO: Figure out throttle/debounce
+            dispatch(setOnboardingDestinationQuery(val));
+            dispatch(setOnboardingDestinationPlaces()); // TODO: Figure out throttle/debounce
           }}
         />
-        <AutoComplete
-          values={destinationPlaces.slice(0, 5).map(formatPlaceIdAndName)}
-          loading={destinationLoading}
+        <AutoCompletePlaces
+          query={destination.query}
+          values={destination.places}
+          loading={destination.loading}
           onPressItem={val => {
-            const destination = destinationPlaces.find(
-              pl => formatPlaceIdAndName(pl) === val,
-            );
-            if (destination) {
-              dispatch(setDestination(destination));
-              if (origin) {
-                props.navigation.navigate('Calendar');
-              }
+            dispatch(setOnboardingDestination(val));
+            if (origin.value) {
+              validateAndNavigateToNextScreen(origin.value, val);
             }
           }}
         />
@@ -128,8 +141,21 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
           {renderDestinationInput()}
         </View>
       </View>
-
       <Image source={require('./background.jpeg')} style={styles.imageStyle} />
+      <TouchableWithoutFeedback
+        onPress={e => {
+          dispatch(resetOnboardingOriginPlaces());
+          dispatch(resetOnboardingDestinationPlaces());
+        }}>
+        <View
+          style={{
+            zIndex: 0,
+            height: '100%',
+            position: 'absolute',
+            width: '100%',
+          }}
+        />
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
@@ -171,11 +197,11 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 1,
   },
-  originContainer: { position: 'absolute', width: '100%', zIndex: 1 },
+  originContainer: { position: 'absolute', width: '100%', zIndex: 2 },
   destinationContainer: {
     position: 'absolute',
     width: '100%',
     top: 60,
-    zIndex: 0,
+    zIndex: 1,
   },
 });

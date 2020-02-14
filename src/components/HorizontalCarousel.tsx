@@ -58,8 +58,6 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
     );
   };
 
-  console.log(props.days);
-
   return (
     <ScrollView
       horizontal={true}

@@ -1,5 +1,11 @@
 import React, { ReactElement, useState } from 'react';
-import { StyleSheet, View, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -11,8 +17,11 @@ import Headline from '../../components/Headline';
 import HorizontalCarousel from '../../components/HorizontalCarousel';
 import moment from 'moment';
 import { ScrollView } from 'react-native-gesture-handler';
-import FlightCard from './FlightCard';
-import Backend from '../../Backend';
+import FlightCard, { BadgeType } from './FlightCard';
+import { useSelector } from '../../store';
+import TextMedium from '../../components/TextMedium';
+import { findCheapestItinerary, getCurrencySymbol } from '../../utils/results';
+import { formatPlaceId } from '../../utils/places';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -32,14 +41,68 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     ];
   };
 
-  Backend.getQuotes({
-    destinationPlace: 'JFK-sky',
-    originPlace: 'SFO-sky',
-    outboundDate: '2020-09-01',
-  }).then(result => console.log(result));
+  const query = useSelector(state => state.query);
+
+  const loading = useSelector(state => state.session.loading);
+  const results = useSelector(state => state.results);
+
+  const renderLoading = () => {
+    return <TextMedium style={{ color: 'black' }}>Loading...</TextMedium>;
+  };
+
+  const renderResults = () => {
+    if (results.Itineraries?.length === 0)
+      return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
+    const cheapest = findCheapestItinerary(results.Itineraries);
+    const leg = results.Legs.find(val => val.Id === cheapest.OutboundLegId);
+    console.log('corresponding leg: ');
+    console.log(leg);
+    return (
+      <>
+        <Headline>
+          {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+            query.destinationPlace,
+          )}`}
+        </Headline>
+        <HorizontalCarousel
+          style={{ height: 120 }}
+          days={generateDays()}
+          selectedDay={selectedDay}
+          selectDay={day => {
+            selectDay(day);
+          }}
+        />
+        <View style={{ marginTop: 40 }}>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL(cheapest.PricingOptions[0].DeeplinkUrl);
+            }}>
+            <FlightCard
+              price={`${cheapest.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
+                results,
+              )}`}
+              badgeType={BadgeType.CHEAPEST}
+              flightInfo={leg}
+            />
+          </TouchableOpacity>
+        </View>
+        {/*  <View style={{ marginTop: 40 }}>
+          <FlightCard price={'45'} badgeType={BadgeType.FASTEST} />
+        </View> */}
+        {/* <View style={{ marginTop: 40 }}>
+          <FlightCard
+            price={'45'}
+            badgeTitle={'Popular'}
+            badgeColor={'rgba(196, 251, 177, 0.8)'}
+            badgeTextColor={'#89D66F'}
+          />
+        </View> */}
+      </>
+    );
+  };
 
   return (
-    <ScrollView>
+    <ScrollView style={{ flex: 1 }}>
       <SafeAreaView style={styles.screen}>
         <StatusBar
           backgroundColor={colors.backgroundBlue}
@@ -47,39 +110,7 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
         />
 
         <View style={styles.container}>
-          <Headline>BER - VCE</Headline>
-          <HorizontalCarousel
-            style={{ height: 120 }}
-            days={generateDays()}
-            selectedDay={selectedDay}
-            selectDay={day => {
-              selectDay(day);
-            }}
-          />
-          <View style={{ marginTop: 40 }}>
-            <FlightCard
-              price={'45'}
-              badgeTitle={'Cheapest'}
-              badgeColor={'rgba(131, 211, 255, 0.8)'}
-              badgeTextColor={'#076EA7'}
-            />
-          </View>
-          <View style={{ marginTop: 40 }}>
-            <FlightCard
-              price={'45'}
-              badgeTitle={'Fastest'}
-              badgeColor={'rgba(248, 190, 186, 0.8)'}
-              badgeTextColor={'#DD8B86'}
-            />
-          </View>
-          <View style={{ marginTop: 40 }}>
-            <FlightCard
-              price={'45'}
-              badgeTitle={'Popular'}
-              badgeColor={'rgba(196, 251, 177, 0.8)'}
-              badgeTextColor={'#89D66F'}
-            />
-          </View>
+          {loading ? renderLoading() : renderResults()}
         </View>
       </SafeAreaView>
     </ScrollView>
@@ -99,6 +130,8 @@ const styles = StyleSheet.create({
   smallText: { fontSize: 18 },
   blackText: { color: colors.black },
   container: {
+    flex: 1,
+    height: '100%',
     paddingVertical: 20,
     paddingHorizontal: 20,
     flexDirection: 'column',

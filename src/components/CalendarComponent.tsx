@@ -14,10 +14,10 @@ import moment from 'moment';
 
 interface Props extends ViewProps {
   month: number;
-  inbound: Date;
-  outbound: Date;
-  onInboundSelect: (inbound: Date) => void;
-  onOutboundSelect: (outbound: Date) => void;
+  inbound: string;
+  outbound: string;
+  onInboundSelect: (inbound: string) => void;
+  onOutboundSelect: (outbound: string) => void;
 }
 
 const CalendarComponent: (props: Props) => ReactElement = props => {
@@ -34,8 +34,8 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
 
     return (
       <View style={[styles.lettersContainer]}>
-        {daysStartWithSunday.map(day => (
-          <View style={styles.item}>
+        {daysStartWithSunday.map((day, index) => (
+          <View style={styles.item} key={index}>
             <View style={styles.alignCenter}>
               <TextMedium style={styles.letterText}>{day}</TextMedium>
             </View>
@@ -47,17 +47,17 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
 
   const renderNumbers: () => ReactElement = () => {
     const numberOfDays = moment()
-      .months(props.month)
+      .month(props.month)
       .daysInMonth();
 
     const firstDayOfMonth = moment()
-      .months(props.month)
+      .month(props.month)
       .startOf('month')
       .weekday(); // 6 = saturday, 0 = sunday
 
-    const emptySpaces = Array.from(Array(firstDayOfMonth).keys()).map(() => (
-      <View style={styles.item} />
-    ));
+    const emptySpaces = Array.from(
+      Array(firstDayOfMonth).keys(),
+    ).map((_val, index) => <View key={index} style={styles.item} />);
 
     const arrayOfNumbers = Array.from(Array(numberOfDays).keys()).map(
       n => n + 1,
@@ -68,7 +68,7 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
 
     const selectedNumber = (number: number) => {
       return (
-        <View style={styles.item}>
+        <View style={styles.item} key={number}>
           <View style={styles.alignCenter}>
             <View style={[styles.numberContainer, styles.selectedCircle]}>
               <Text
@@ -98,8 +98,12 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
           }
           return (
             <TouchableOpacity
+              key={number}
               onPress={() => {
-                if (!isFrom) setIsFrom(number);
+                if (!isFrom) {
+                  props.onOutboundSelect(/* format number to ISO string date */);
+                  setIsFrom(number);
+                }
                 if (isFrom && !isTo && number > isFrom) setIsTo(number);
                 if (isFrom && !isTo && number < isFrom) setIsFrom(number);
                 if (isFrom && isTo) {

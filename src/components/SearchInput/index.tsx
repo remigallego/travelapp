@@ -1,10 +1,17 @@
 import React, { ReactElement } from 'react';
-import { StyleSheet, TextInputProps, Animated } from 'react-native';
+import {
+  StyleSheet,
+  TextInputProps,
+  Animated,
+  ActivityIndicator,
+} from 'react-native';
 import colors from '../../colors';
 import { TextInput } from 'react-native-gesture-handler';
 import { useAnimation } from 'react-native-animation-hooks';
 
-interface Props extends TextInputProps {}
+interface Props extends TextInputProps {
+  loading: boolean;
+}
 
 const SearchInput: (props: Props) => ReactElement = props => {
   const valueIsEmpty =
@@ -19,19 +26,23 @@ const SearchInput: (props: Props) => ReactElement = props => {
 
   return (
     <Animated.View style={[styles.searchInput, styles.dropShadow, props.style]}>
-      <Animated.Image
-        source={require('./glass.png')}
-        style={[
-          styles.image,
-          {
-            // Doesn't work with the debugger on
-            tintColor: colorAnimation.interpolate({
-              inputRange: [0, 100],
-              outputRange: [colors.darkerGrey, colors.blue],
-            }),
-          },
-        ]}
-      />
+      {props.loading ? (
+        <ActivityIndicator style={styles.image} />
+      ) : (
+        <Animated.Image
+          source={require('./glass.png')}
+          style={[
+            styles.image,
+            {
+              // Doesn't work with the debugger on
+              tintColor: colorAnimation.interpolate({
+                inputRange: [0, 100],
+                outputRange: [colors.darkerGrey, colors.blue],
+              }),
+            },
+          ]}
+        />
+      )}
       <TextInput
         {...props}
         selectTextOnFocus

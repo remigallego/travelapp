@@ -1,11 +1,10 @@
-import { Place } from '../Backend/types';
 import { ThunkDispatch } from 'redux-thunk';
 import { AppState } from '../store';
 import { Action } from 'redux';
 
 export interface CalendarState {
-  inboundDate: Date;
-  outboundDate: Date;
+  inboundDate: string;
+  outboundDate: string;
 }
 
 const initialState: CalendarState = {
@@ -44,7 +43,7 @@ export const setInboundDate = (inboundDate: Date) => (
   });
 };
 
-export const setOutboundDate = (outboundDate: Date) => ({
+export const setOutboundDate = (outboundDate: string) => ({
   type: SET_OUTBOUND_DATE,
   payload: {
     outboundDate,

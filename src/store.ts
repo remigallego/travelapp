@@ -1,5 +1,7 @@
 import logger from 'redux-logger';
-import searchReducer, { SearchState } from './reducers/search';
+import onboardingSearchReducer, {
+  OnboardingSearchState,
+} from './reducers/onboardingSearch';
 import calendarReducer, { CalendarState } from './reducers/calendar';
 import thunk from 'redux-thunk';
 import { createStore, compose, applyMiddleware, combineReducers } from 'redux';
@@ -10,17 +12,26 @@ import {
 import localisationReducer, {
   LocalisationState,
 } from './reducers/localisation';
+import queryReducer, { QueryState } from './reducers/query';
+import sessionReducer, { SessionState } from './reducers/session';
+import resultsReducer, { ResultsState } from './reducers/results';
 
 export interface AppState {
-  search: SearchState;
+  onboardingSearch: OnboardingSearchState;
   calendar: CalendarState;
+  query: QueryState;
   localisation: LocalisationState;
+  session: SessionState;
+  results: ResultsState;
 }
 
 const rootReducer = combineReducers({
-  search: searchReducer,
+  onboardingSearch: onboardingSearchReducer,
   calendar: calendarReducer,
+  query: queryReducer,
   localisation: localisationReducer,
+  session: sessionReducer,
+  results: resultsReducer,
 });
 
 const store = createStore(

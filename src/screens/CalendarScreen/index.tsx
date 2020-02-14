@@ -18,6 +18,7 @@ import { useSelector } from '../../store';
 import { formatPlaceId } from '../../utils/places';
 import { useDispatch } from 'react-redux';
 import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
+import { createSession } from '../../reducers/query';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -44,10 +45,10 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
 
   const months = generateNextDates();
 
-  const origin = useSelector(state => state.search.origin);
-  const destination = useSelector(state => state.search.destination);
-  const inbound = useSelector(state => state.calendar.inboundDate);
-  const outbound = useSelector(state => state.calendar.outboundDate);
+  const origin = useSelector(state => state.query.originPlace);
+  const destination = useSelector(state => state.query.destinationPlace);
+  const inbound = useSelector(state => state.query.inboundDate);
+  const outbound = useSelector(state => state.query.outboundDate);
 
   const dispatch = useDispatch();
   return (
@@ -82,13 +83,16 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
           month={selectedMonth}
           inbound={inbound}
           outbound={outbound}
-          onInboundSelect={v => dispatch(setInboundDate(v))}
           onOutboundSelect={v => dispatch(setOutboundDate(v))}
+          onInboundSelect={v => dispatch(setInboundDate(v))}
         />
 
         <ButtonComponent
           style={styles.smallMarginTop}
-          onPress={() => props.navigation.navigate('Results')}>
+          onPress={() => {
+            dispatch(createSession());
+            props.navigation.navigate('Results');
+          }}>
           Search
         </ButtonComponent>
       </View>
