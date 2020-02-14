@@ -5,7 +5,7 @@ import {
   Animated,
   ActivityIndicator,
 } from 'react-native';
-import colors from '../../colors';
+import colors from '../../../colors';
 import { TextInput } from 'react-native-gesture-handler';
 import { useAnimation } from 'react-native-animation-hooks';
 

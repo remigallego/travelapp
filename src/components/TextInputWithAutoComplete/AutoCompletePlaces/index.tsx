@@ -6,19 +6,19 @@ import {
   ScrollView,
   Animated,
 } from 'react-native';
-import TextLight from '../TextLight';
-import colors from '../../colors';
-import { Place } from '../../Backend/types';
+import TextLight from '../../TextLight';
+import colors from '../../../colors';
+import { Place } from '../../../Backend/types';
 import {
   formatPlaceIdAndName,
   isCity,
   isCountry,
   isAirport,
   formatPlaceId,
-} from '../../utils/places';
+} from '../../../utils/places';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faCity, faPlane, faFlag } from '@fortawesome/free-solid-svg-icons';
-import TextBold from '../TextBold';
+import TextBold from '../../TextBold';
 
 interface Props {
   query: string;
@@ -142,7 +142,7 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
 
   return (
     <ScrollView
-      bounces={true}
+      keyboardShouldPersistTaps={true}
       style={[
         styles.container,
         {
@@ -150,10 +150,10 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
         },
       ]}>
       {!props.loading && (
-        <View>
+        <>
           {cities.map(renderAirportOfThisCity)}
           {airportsNotIncludedInACity.map(renderAirport)}
-        </View>
+        </>
       )}
     </ScrollView>
   );

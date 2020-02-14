@@ -11,7 +11,6 @@ export default class Backend {
   public static createSession = async (opts: SessionsOpts) => {
     try {
       console.log('Backend: createSession');
-      console.log(qs.stringify(opts));
       const response = await fetch(
         'https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/pricing/v1.0',
         {
@@ -26,7 +25,9 @@ export default class Backend {
           body: qs.stringify(opts, { skipNulls: true }),
         },
       );
+      console.log(response);
       const location = response.headers.get('location');
+      console.log(location);
       const key = location.split('/').pop();
       return key;
     } catch (e) {
@@ -76,7 +77,6 @@ export default class Backend {
           },
         },
       );
-      console.log('success');
       return response.data.Places;
     } catch (e) {
       throw e;
