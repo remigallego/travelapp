@@ -26,7 +26,7 @@ import { formatPlaceId } from '../../utils/places';
 import { selectResults } from '../../reducers/results';
 import { Itinerary } from '../../Backend/types';
 import { useDispatch } from 'react-redux';
-import { setOutboundToQuery } from '../../reducers/query';
+import { setOutboundToQuery, setInboundToQuery } from '../../reducers/query';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -34,17 +34,18 @@ interface Props {
 
 const ResultsScreen: (props: Props) => ReactElement = () => {
   const outboundDate = useSelector(state => state.query.outboundDate);
+  const inboundDate = useSelector(state => state.query.inboundDate);
   const [selectedDay, selectDay] = useState(moment(outboundDate));
 
-  const generateDays = () => {
+  const generateDays = date => {
     return [
-      moment(outboundDate).subtract('3', 'day'),
-      moment(outboundDate).subtract('2', 'day'),
-      moment(outboundDate).subtract('1', 'day'),
-      moment(outboundDate),
-      moment(outboundDate).add('1', 'day'),
-      moment(outboundDate).add('2', 'day'),
-      moment(outboundDate).add('3', 'day'),
+      moment(date).subtract('3', 'day'),
+      moment(date).subtract('2', 'day'),
+      moment(date).subtract('1', 'day'),
+      moment(date),
+      moment(date).add('1', 'day'),
+      moment(date).add('2', 'day'),
+      moment(date).add('3', 'day'),
     ];
   };
 
@@ -78,10 +79,13 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     if (itineraries?.length === 0)
       return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
 
-    /*     const fastestId = findFastestItineraries(itineraries, results.Legs);
-     */
     return itineraries.map((itinerary, index) => {
-      const leg = results.Legs.find(val => val.Id === itinerary.OutboundLegId);
+      const outboundLeg = results.Legs.find(
+        val => val.Id === itinerary.OutboundLegId,
+      );
+      const inboundLeg = results.Legs.find(
+        val => val.Id === itinerary.InboundLegId,
+      );
 
       const getBadgeType = () => {
         if (index === 0) {
@@ -104,7 +108,8 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
                   results,
                 )}`}
                 badgeType={getBadgeType()}
-                flightInfo={leg}
+                outboundLeg={outboundLeg}
+                inboundLeg={inboundLeg}
               />
             </TouchableOpacity>
           </View>
@@ -117,7 +122,7 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     <SafeAreaView style={styles.screen}>
       <View>
         <ScrollView
-          style={{ paddingVertical: 20 }}
+          style={{ marginVertical: 20 }}
           stickyHeaderIndices={[1]}
           contentContainerStyle={{
             flexGrow: 1,
@@ -127,20 +132,30 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
             barStyle={'dark-content'}
           />
           <View style={{ backgroundColor: colors.grey, paddingBottom: 10 }}>
-            <Headline style={{ paddingHorizontal: 20 }}>
+            <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
               {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
                 query.destinationPlace,
               )}`}
             </Headline>
-            <View style={{ height: 130 }}>
-              <HorizontalCarousel
-                days={generateDays()}
-                selectedDay={selectedDay}
-                selectDay={day => {
-                  dispatch(setOutboundToQuery(day.toDate()));
-                  selectDay(day);
-                }}
-              />
+            <HorizontalCarousel
+              days={generateDays(outboundDate)}
+              selectedDay={moment(outboundDate)}
+              selectDay={day => {
+                dispatch(setOutboundToQuery(day.toDate()));
+                selectDay(day);
+              }}
+            />
+            <View style={{ flex: 1, marginTop: 10 }}>
+              {query.inboundDate && (
+                <HorizontalCarousel
+                  days={generateDays(inboundDate)}
+                  selectedDay={moment(inboundDate)}
+                  selectDay={day => {
+                    dispatch(setInboundToQuery(day.toDate()));
+                    selectDay(day);
+                  }}
+                />
+              )}
             </View>
           </View>
 
@@ -171,7 +186,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
-    paddingVertical: 20,
     paddingHorizontal: 20,
     flexDirection: 'column',
   },

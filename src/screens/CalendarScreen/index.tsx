@@ -18,7 +18,11 @@ import { useSelector } from '../../store';
 import { formatPlaceId } from '../../utils/places';
 import { useDispatch } from 'react-redux';
 import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
-import { createSession, setOutboundToQuery } from '../../reducers/query';
+import {
+  createSession,
+  setOutboundToQuery,
+  setInboundToQuery,
+} from '../../reducers/query';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -49,7 +53,7 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
   const destination = useSelector(state => state.query.destinationPlace);
   const inbound = useSelector(state => state.calendar.inboundDate);
   const outbound = useSelector(state => state.calendar.outboundDate);
-
+  console.log(inbound);
   const dispatch = useDispatch();
   return (
     <SafeAreaView style={styles.screen}>
@@ -92,6 +96,7 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
           disabled={outbound === null}
           onPress={() => {
             dispatch(setOutboundToQuery(outbound));
+            dispatch(setInboundToQuery(inbound));
             dispatch(createSession());
             props.navigation.navigate('Results');
           }}>

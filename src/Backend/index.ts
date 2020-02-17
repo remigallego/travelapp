@@ -11,6 +11,7 @@ export default class Backend {
   public static createSession = async (opts: SessionsOpts) => {
     try {
       console.log('Backend: createSession');
+      console.log(opts);
       const response = await fetch(
         'https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/pricing/v1.0',
         {

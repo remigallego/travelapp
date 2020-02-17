@@ -17,25 +17,54 @@ export enum BadgeType {
 interface Props {
   badgeType: BadgeType;
   price: string;
-  flightInfo: Leg;
+  outboundLeg: Leg;
+  inboundLeg: Leg;
 }
 
 const FlightCard = (props: Props) => {
-  const flightInfo = props.flightInfo;
+  const outboundLeg = props.outboundLeg;
+  const inboundLeg = props.inboundLeg;
   const query = useSelector(state => state.query);
 
   const carrier = useSelector(state => {
-    const id = flightInfo.Carriers[0];
+    const id = outboundLeg.Carriers[0];
     return state.results.Carriers.find(c => c.Id === id);
   });
 
   const renderInbound = () => {
+    if (inboundLeg) {
+      return (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>
+              {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
+                query.originPlace,
+              )}`}
+            </TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {moment(inboundLeg.Departure).format('hh:mm A')} -{' '}
+              {moment(inboundLeg.Arrival).format('hh:mm A')}
+            </TextMedium>
+          </View>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>Time</TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {renderDuration(inboundLeg)}
+            </TextMedium>
+          </View>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>Transfer</TextMedium>
+            <TextMedium style={styles.subTitle}>-</TextMedium>
+          </View>
+        </View>
+      );
+    }
     // if(inbound) { ...}
   };
 
-  const renderDuration = () => {
+  const renderDuration = (leg: Leg) => {
     // @ts-ignore
-    return moment.duration(flightInfo.Duration, 'minutes').format('hh:m');
+    return moment.duration(leg.Duration, 'minutes').format('hh:m');
   };
 
   const renderBadge = () => {
@@ -108,13 +137,15 @@ const FlightCard = (props: Props) => {
               )}`}
             </TextMedium>
             <TextMedium style={styles.subTitle}>
-              {moment(flightInfo.Departure).format('hh:mm A')} -{' '}
-              {moment(flightInfo.Arrival).format('hh:mm A')}
+              {moment(outboundLeg.Departure).format('hh:mm A')} -{' '}
+              {moment(outboundLeg.Arrival).format('hh:mm A')}
             </TextMedium>
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Time</TextMedium>
-            <TextMedium style={styles.subTitle}>{renderDuration()}</TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {renderDuration(outboundLeg)}
+            </TextMedium>
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Transfer</TextMedium>

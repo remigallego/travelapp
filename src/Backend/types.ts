@@ -39,6 +39,7 @@ export interface Place {
 
 export interface Itinerary {
   OutboundLegId: string;
+  InboundLegId?: string;
   PricingOptions: PricingOptions[];
   BookingDetailsLink: {
     Uri: string;

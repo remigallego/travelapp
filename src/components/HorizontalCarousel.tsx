@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -36,7 +36,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
               backgroundColor: isSelected ? colors.blue : colors.white,
             },
           ]}>
-          <TextMedium
+          {/*  <TextMedium
             style={[
               styles.smallText,
               {
@@ -47,7 +47,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
               .format('ddd dddd')
               .toUpperCase()
               .slice(0, 3)}
-          </TextMedium>
+          </TextMedium> */}
           <TextMedium
             style={[
               styles.bigText,
@@ -58,7 +58,16 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
             {day
               .format('D')
               .toUpperCase()
-              .slice(0, 3)}
+              .slice(0, 3)}{' '}
+          </TextMedium>
+          <TextMedium
+            style={[
+              styles.smallText,
+              {
+                color: isSelected ? colors.grey : colors.black,
+              },
+            ]}>
+            {day.format('LL').slice(0, 3)}
           </TextMedium>
         </View>
       </TouchableOpacity>
@@ -67,6 +76,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
 
   return (
     <ScrollView
+      contentOffset={{ x: 130, y: 130 }}
       horizontal={true}
       scrollEventThrottle={10}
       style={[styles.scrollView, props.style]}
@@ -80,7 +90,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
 export default HorizontalCarousel;
 
 const styles = StyleSheet.create({
-  card: { height: 150, paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 },
+  card: { paddingHorizontal: 0, paddingBottom: 0, paddingTop: 0 },
   text: {
     color: colors.white,
     fontSize: 36,
@@ -103,14 +113,17 @@ const styles = StyleSheet.create({
   textContainer: {
     height: '100%',
     borderRadius: 80,
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingBottom: 10
   },
   smallText: {
-    fontSize: 20,
+    fontSize: 12,
+    lineHeight: 1,
   },
   bigText: {
-    fontSize: 30,
+    fontSize: 22,
+    lineHeight: 1,
   },
 });

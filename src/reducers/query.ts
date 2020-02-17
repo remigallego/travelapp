@@ -134,8 +134,14 @@ export const createSession = () => {
 
     const craftOptions: () => SessionsOpts = () => {
       const searchSession = getState().query;
+      let inboundDate = null;
+      if (searchSession.inboundDate) {
+        inboundDate = moment(searchSession.inboundDate).format(DATE_FORMAT);
+      }
+
       return {
         ...searchSession,
+        inboundDate,
         outboundDate: moment(searchSession.outboundDate).format(DATE_FORMAT),
         destinationPlace: searchSession.destinationPlace.PlaceId,
         originPlace: searchSession.originPlace.PlaceId,
