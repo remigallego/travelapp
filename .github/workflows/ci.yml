@@ -11,5 +11,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build Android Release
       run: |
+        npm install
         cd android
         ./gradlew assembleRelease
