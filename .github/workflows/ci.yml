@@ -14,3 +14,8 @@ jobs:
         npm install
         cd android
         ./gradlew assembleRelease
+    - uses: actions/upload-artifact@v1
+      with:
+        name: app-release.apk
+        path: app/build/outputs/apk/release/
+        
