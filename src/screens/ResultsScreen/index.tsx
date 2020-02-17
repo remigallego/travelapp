@@ -5,6 +5,7 @@ import {
   StatusBar,
   Linking,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,100 +21,143 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FlightCard, { BadgeType } from './FlightCard';
 import { useSelector } from '../../store';
 import TextMedium from '../../components/TextMedium';
-import { findCheapestItinerary, getCurrencySymbol } from '../../utils/results';
+import {
+  findCheapestItinerary,
+  getCurrencySymbol,
+  findFastestLegId,
+  findFastestItineraries,
+} from '../../utils/results';
 import { formatPlaceId } from '../../utils/places';
+import { selectResults } from '../../reducers/results';
+import { Itinerary } from '../../Backend/types';
+import { useDispatch } from 'react-redux';
+import { setOutboundToQuery } from '../../reducers/query';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
 const ResultsScreen: (props: Props) => ReactElement = () => {
-  const [selectedDay, selectDay] = useState(moment());
+  const outboundDate = useSelector(state => state.query.outboundDate);
+  const [selectedDay, selectDay] = useState(moment(outboundDate));
 
   const generateDays = () => {
     return [
-      moment(),
-      moment().add('1', 'day'),
-      moment().add('2', 'day'),
-      moment().add('3', 'day'),
-      moment().add('4', 'day'),
-      moment().add('5', 'day'),
+      moment(outboundDate).subtract('3', 'day'),
+      moment(outboundDate).subtract('2', 'day'),
+      moment(outboundDate).subtract('1', 'day'),
+      moment(outboundDate),
+      moment(outboundDate).add('1', 'day'),
+      moment(outboundDate).add('2', 'day'),
+      moment(outboundDate).add('3', 'day'),
     ];
   };
 
   const query = useSelector(state => state.query);
 
   const loading = useSelector(state => state.session.loading);
-  const results = useSelector(state => state.results);
+  const results = useSelector(selectResults);
+
+  const dispatch = useDispatch();
 
   const renderLoading = () => {
-    return <TextMedium style={{ color: 'black' }}>Loading...</TextMedium>;
-  };
-
-  const renderResults = () => {
-    if (results.Itineraries?.length === 0)
-      return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
-    const cheapest = findCheapestItinerary(results.Itineraries);
-    const leg = results.Legs.find(val => val.Id === cheapest.OutboundLegId);
-    console.log('corresponding leg: ');
-    console.log(leg);
     return (
-      <>
-        <Headline>
-          {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
-            query.destinationPlace,
-          )}`}
-        </Headline>
-        <HorizontalCarousel
-          style={{ height: 120 }}
-          days={generateDays()}
-          selectedDay={selectedDay}
-          selectDay={day => {
-            selectDay(day);
+      <View style={{ height: '100%' }}>
+        <ActivityIndicator
+          size={80}
+          color={colors.blue}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 999,
           }}
         />
-        <View style={{ marginTop: 40 }}>
-          <TouchableOpacity
-            onPress={() => {
-              Linking.openURL(cheapest.PricingOptions[0].DeeplinkUrl);
-            }}>
-            <FlightCard
-              price={`${cheapest.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
-                results,
-              )}`}
-              badgeType={BadgeType.CHEAPEST}
-              flightInfo={leg}
-            />
-          </TouchableOpacity>
-        </View>
-        {/*  <View style={{ marginTop: 40 }}>
-          <FlightCard price={'45'} badgeType={BadgeType.FASTEST} />
-        </View> */}
-        {/* <View style={{ marginTop: 40 }}>
-          <FlightCard
-            price={'45'}
-            badgeTitle={'Popular'}
-            badgeColor={'rgba(196, 251, 177, 0.8)'}
-            badgeTextColor={'#89D66F'}
-          />
-        </View> */}
-      </>
+      </View>
     );
   };
 
-  return (
-    <ScrollView style={{ flex: 1 }}>
-      <SafeAreaView style={styles.screen}>
-        <StatusBar
-          backgroundColor={colors.backgroundBlue}
-          barStyle={'dark-content'}
-        />
+  const renderResults = (itineraries: Itinerary[]) => {
+    if (itineraries?.length === 0)
+      return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
 
-        <View style={styles.container}>
-          {loading ? renderLoading() : renderResults()}
-        </View>
-      </SafeAreaView>
-    </ScrollView>
+    /*     const fastestId = findFastestItineraries(itineraries, results.Legs);
+     */
+    return itineraries.map((itinerary, index) => {
+      const leg = results.Legs.find(val => val.Id === itinerary.OutboundLegId);
+
+      const getBadgeType = () => {
+        if (index === 0) {
+          return BadgeType.CHEAPEST;
+        }
+        /*   if (itinerary.OutboundLegId === fastestId) {
+          return BadgeType.FASTEST;
+        } */
+        return BadgeType.NONE;
+      };
+      return (
+        <>
+          <View style={{ marginTop: 40 }}>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(itinerary.PricingOptions[0].DeeplinkUrl);
+              }}>
+              <FlightCard
+                price={`${itinerary.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
+                  results,
+                )}`}
+                badgeType={getBadgeType()}
+                flightInfo={leg}
+              />
+            </TouchableOpacity>
+          </View>
+        </>
+      );
+    });
+  };
+
+  return (
+    <SafeAreaView style={styles.screen}>
+      <View>
+        <ScrollView
+          style={{ paddingVertical: 20 }}
+          stickyHeaderIndices={[1]}
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}>
+          <StatusBar
+            backgroundColor={colors.backgroundBlue}
+            barStyle={'dark-content'}
+          />
+          <View style={{ backgroundColor: colors.grey, paddingBottom: 10 }}>
+            <Headline style={{ paddingHorizontal: 20 }}>
+              {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+                query.destinationPlace,
+              )}`}
+            </Headline>
+            <View style={{ height: 130 }}>
+              <HorizontalCarousel
+                days={generateDays()}
+                selectedDay={selectedDay}
+                selectDay={day => {
+                  dispatch(setOutboundToQuery(day.toDate()));
+                  selectDay(day);
+                }}
+              />
+            </View>
+          </View>
+
+          <>
+            <View style={styles.container}>
+              {loading && renderLoading()}
+              {!loading && renderResults(results.Itineraries.slice(0, 5))}
+            </View>
+          </>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 

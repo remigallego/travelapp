@@ -4,6 +4,25 @@ import { Action } from 'redux';
 import Backend from '../Backend';
 import { Place } from '../Backend/types';
 
+const DEBUG_VALUES = {
+  origin: {
+    PlaceId: 'TXL-sky',
+    PlaceName: 'Berlin Tegel',
+    CountryId: 'DE-sky',
+    RegionId: '',
+    CityId: 'BERL-sky',
+    CountryName: 'Germany',
+  },
+  destination: {
+    PlaceId: 'CDG-sky',
+    PlaceName: 'Paris Charles de Gaulle',
+    CountryId: 'FR-sky',
+    RegionId: '',
+    CityId: 'PARI-sky',
+    CountryName: 'France',
+  },
+};
+
 export type InputType = 'origin' | 'destination';
 
 export interface InputState<T> {
@@ -36,13 +55,30 @@ const initialState: OnboardingSearchState = {
   },
 };
 
+const intialStateDEBUG: OnboardingSearchState = {
+  origin: {
+    type: 'origin',
+    value: DEBUG_VALUES.origin,
+    query: '',
+    places: [],
+    loading: false,
+  },
+  destination: {
+    type: 'destination',
+    value: DEBUG_VALUES.destination,
+    query: '',
+    places: [],
+    loading: false,
+  },
+};
+
 const SET_ONBOARDING_QUERY = 'SET_ONBOARDING_QUERY';
 const TOGGLE_ONBOARDING_LOADING = 'TOGGLE_ONBOARDING_LOADING';
 const SET_ONBOARDING_VALUE = 'SET_ONBOARDING_VALUE';
 const SET_ONBOARDING_PLACES = 'SET_ONBOARDING_PLACES';
 
 const onboardingSearchReducer = (
-  state: OnboardingSearchState = initialState,
+  state: OnboardingSearchState = intialStateDEBUG,
   action: any,
 ) => {
   switch (action.type) {

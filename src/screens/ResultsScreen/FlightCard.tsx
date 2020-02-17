@@ -1,18 +1,18 @@
 import React from 'react';
 import Card from '../../components/Card';
 import TextMedium from '../../components/TextMedium';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import colors from '../../colors';
 import TextSemiBold from '../../components/TextSemiBold';
 import { Leg } from '../../Backend/types';
 import moment from 'moment';
 import { useSelector } from '../../store';
 import { formatPlaceId } from '../../utils/places';
-import * as momentDuration from 'moment-duration-format';
-
+import 'moment-duration-format';
 export enum BadgeType {
   CHEAPEST,
   FASTEST,
+  NONE,
 }
 interface Props {
   badgeType: BadgeType;
@@ -24,50 +24,79 @@ const FlightCard = (props: Props) => {
   const flightInfo = props.flightInfo;
   const query = useSelector(state => state.query);
 
+  const carrier = useSelector(state => {
+    const id = flightInfo.Carriers[0];
+    return state.results.Carriers.find(c => c.Id === id);
+  });
+
   const renderInbound = () => {
     // if(inbound) { ...}
   };
 
   const renderDuration = () => {
-    const duration = moment.duration(flightInfo.Duration, 'seconds');
-    return duration.as('h');
+    // @ts-ignore
+    return moment.duration(flightInfo.Duration, 'minutes').format('hh:m');
+  };
+
+  const renderBadge = () => {
+    if (props.badgeType === BadgeType.NONE) {
+      return;
+    }
+
+    const getBackgroundColor = () => {
+      if (props.badgeType === BadgeType.CHEAPEST) {
+        return 'rgba(131, 211, 255, 0.8)';
+      }
+      if (props.badgeType === BadgeType.FASTEST) {
+        return 'rgba(131, 211, 111, 0.8)';
+      }
+      return 'rgba(255, 255, 255, 0.8)';
+    };
+    const getTextColor = () => {
+      if (props.badgeType === BadgeType.CHEAPEST) {
+        return 'white';
+      }
+      if (props.badgeType === BadgeType.FASTEST) {
+        return 'white';
+      }
+      return 'rgba(255, 255, 255, 0.8)';
+    };
+
+    return (
+      <Card
+        style={[
+          styles.badge,
+          {
+            backgroundColor: getBackgroundColor(),
+          },
+        ]}>
+        <TextSemiBold
+          style={[
+            styles.badgeText,
+            {
+              color: getTextColor(),
+            },
+          ]}>
+          {props.badgeType === BadgeType.CHEAPEST && 'Cheapest'}
+          {props.badgeType === BadgeType.FASTEST && 'Fastest'}
+        </TextSemiBold>
+      </Card>
+    );
   };
 
   return (
     <Card>
-      <Card
-        style={{
-          backgroundColor:
-            props.badgeType === BadgeType.CHEAPEST
-              ? 'rgba(131, 211, 255, 0.8)'
-              : 'rgba(248, 190, 186, 0.8)',
-          paddingTop: 0,
-          paddingBottom: 5,
-          paddingHorizontal: 10,
-          width: 120,
-          position: 'absolute',
-          top: -20,
-          left: 35,
-          flexDirection: 'row',
-          justifyContent: 'center',
-        }}>
-        <TextSemiBold
-          style={{
-            fontSize: 15,
-            paddingTop: 15,
-            color: props.badgeType === BadgeType.CHEAPEST ? 'white' : 'black',
-          }}>
-          {props.badgeType === BadgeType.CHEAPEST ? 'Cheapest' : 'Fastest'}
-        </TextSemiBold>
-      </Card>
+      {renderBadge()}
       <View style={{ flexDirection: 'column' }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <TextMedium style={[styles.blackText, { fontSize: 24 }]}>
             {props.price}
           </TextMedium>
           <View style={{ flexDirection: 'row' }}>
-            <View style={styles.iconPlaceholder} />
-            <View style={styles.iconPlaceholder} />
+            <Image
+              source={{ uri: carrier.ImageUrl }}
+              style={{ width: 50, resizeMode: 'contain' }}
+            />
           </View>
         </View>
 
@@ -79,15 +108,13 @@ const FlightCard = (props: Props) => {
               )}`}
             </TextMedium>
             <TextMedium style={styles.subTitle}>
-              {moment(flightInfo.Departure).format('hh:mm')} -{' '}
-              {moment(flightInfo.Arrival).format('hh:mm')}
+              {moment(flightInfo.Departure).format('hh:mm A')} -{' '}
+              {moment(flightInfo.Arrival).format('hh:mm A')}
             </TextMedium>
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Time</TextMedium>
-            <TextMedium style={styles.subTitle}>
-              {/* renderDuration() */}
-            </TextMedium>
+            <TextMedium style={styles.subTitle}>{renderDuration()}</TextMedium>
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Transfer</TextMedium>
@@ -104,6 +131,21 @@ const FlightCard = (props: Props) => {
 export default FlightCard;
 
 const styles = StyleSheet.create({
+  badge: {
+    paddingTop: 0,
+    paddingBottom: 5,
+    paddingHorizontal: 10,
+    width: 120,
+    position: 'absolute',
+    top: -20,
+    left: 35,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    fontSize: 15,
+    paddingTop: 15,
+  },
   blackText: { color: colors.black },
   iconPlaceholder: {
     height: 20,

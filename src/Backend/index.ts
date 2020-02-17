@@ -25,9 +25,7 @@ export default class Backend {
           body: qs.stringify(opts, { skipNulls: true }),
         },
       );
-      console.log(response);
       const location = response.headers.get('location');
-      console.log(location);
       const key = location.split('/').pop();
       return key;
     } catch (e) {

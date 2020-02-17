@@ -16,7 +16,13 @@ const ButtonComponent: (props: Props) => ReactElement = props => {
   const { children, style, ...otherProps } = props;
   return (
     <TouchableOpacity style={[styles.flexContainer, style]} {...otherProps}>
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            opacity: props.disabled ? 0.4 : 1,
+          },
+        ]}>
         <TextSemiBold style={styles.text}>{children}</TextSemiBold>
       </View>
     </TouchableOpacity>

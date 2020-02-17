@@ -3,8 +3,8 @@ import { AppState } from '../store';
 import { Action } from 'redux';
 
 export interface CalendarState {
-  inboundDate: string;
-  outboundDate: string;
+  inboundDate: Date;
+  outboundDate: Date;
 }
 
 const initialState: CalendarState = {
@@ -43,7 +43,7 @@ export const setInboundDate = (inboundDate: Date) => (
   });
 };
 
-export const setOutboundDate = (outboundDate: string) => ({
+export const setOutboundDate = (outboundDate: Date) => ({
   type: SET_OUTBOUND_DATE,
   payload: {
     outboundDate,

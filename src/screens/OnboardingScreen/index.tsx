@@ -5,6 +5,7 @@ import {
   Image,
   StatusBar,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
@@ -24,9 +25,10 @@ import {
 } from '../../reducers/onboardingSearch';
 import { useDispatch } from 'react-redux';
 import { useSelector } from '../../store';
-import { setDestination, setOrigin } from '../../reducers/query';
+import { setDestinationToQuery, setOriginToQuery } from '../../reducers/query';
 import { Place } from '../../Backend/types';
 import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplete';
+import TextMedium from '../../components/TextMedium';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -40,8 +42,8 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     originValue: Place,
     destinationValue: Place,
   ) => {
-    dispatch(setOrigin(originValue));
-    dispatch(setDestination(destinationValue));
+    dispatch(setOriginToQuery(originValue));
+    dispatch(setDestinationToQuery(destinationValue));
     props.navigation.navigate('Calendar');
   };
 
@@ -116,6 +118,13 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
         </View>
       </View>
       <Image source={require('./background.jpeg')} style={styles.imageStyle} />
+      <TouchableOpacity
+        onPress={() => {
+          setValuesAndNavigateToNextScreen(origin.value, destination.value);
+        }}
+        style={{ position: 'absolute', bottom: 0, zIndex: 99999 }}>
+        <TextMedium>Next</TextMedium>
+      </TouchableOpacity>
       <TouchableWithoutFeedback
         onPress={_e => {
           resetPlaces();

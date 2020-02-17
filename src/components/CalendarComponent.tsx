@@ -14,24 +14,15 @@ import moment from 'moment';
 
 interface Props extends ViewProps {
   month: number;
-  inbound: string;
-  outbound: string;
-  onInboundSelect: (inbound: string) => void;
-  onOutboundSelect: (outbound: string) => void;
+  inbound: Date;
+  outbound: Date;
+  onInboundSelect: (inbound: Date) => void;
+  onOutboundSelect: (outbound: Date) => void;
 }
 
 const CalendarComponent: (props: Props) => ReactElement = props => {
-  const [isFrom, setIsFrom] = useState<number | null>(null);
-  const [isTo, setIsTo] = useState<number | null>(null);
-
-  useLayoutEffect(() => {
-    setIsFrom(null);
-    setIsTo(null);
-  }, [props.month]);
-
   const renderLetters = () => {
     const daysStartWithSunday = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
     return (
       <View style={[styles.lettersContainer]}>
         {daysStartWithSunday.map((day, index) => (
@@ -59,56 +50,87 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
       Array(firstDayOfMonth).keys(),
     ).map((_val, index) => <View key={index} style={styles.item} />);
 
-    const arrayOfNumbers = Array.from(Array(numberOfDays).keys()).map(
-      n => n + 1,
-    );
+    const arrayOfDates = Array.from(Array(numberOfDays).keys()).map(n => {
+      return moment()
+        .month(props.month)
+        .date(n + 1)
+        .startOf('day')
+        .toDate();
+    });
 
-    const isInRange = (number: number) =>
-      isFrom && isTo && isFrom < number && number < isTo;
+    const isInRange = (date: Date) =>
+      moment(date).isBetween(props.outbound, props.inbound);
 
-    const selectedNumber = (number: number) => {
+    const selectedNumber = (date: Date) => {
       return (
-        <View style={styles.item} key={number}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            if (
+              (props.outbound && moment(date).isSame(props.outbound)) ||
+              (props.inbound && moment(date).isSame(props.inbound))
+            ) {
+              console.log('here');
+              props.onOutboundSelect(null);
+              props.onInboundSelect(null);
+            }
+          }}
+          style={styles.item}
+          key={date.toISOString()}>
           <View style={styles.alignCenter}>
             <View style={[styles.numberContainer, styles.selectedCircle]}>
               <Text
-                key={number}
+                key={date.getDay()}
                 style={[styles.numberText, styles.selectedText]}>
-                {number.toString()}
+                {date.getDate()}
               </Text>
             </View>
             <View
               style={[
-                isFrom && isTo ? styles.absoluteBackgroundColor : {},
-                number === isFrom && { right: 0 },
-                number === isTo && { left: 0 },
+                props.outbound?.getDate() && props.inbound?.getDate()
+                  ? styles.absoluteBackgroundColor
+                  : {},
+                date.getDate() === props.outbound?.getDate() && { right: 0 },
+                date.getDate() === props.inbound?.getDate() && { left: 0 },
               ]}
             />
           </View>
-        </View>
+        </TouchableOpacity>
       );
     };
 
     return (
       <View style={styles.numbersFullContainer}>
         {emptySpaces}
-        {arrayOfNumbers.map(number => {
-          if (number === isFrom || number === isTo) {
-            return selectedNumber(number);
+        {arrayOfDates.map(date => {
+          if (
+            moment(date).isSame(props.outbound) ||
+            moment(date).isSame(props.inbound)
+          ) {
+            return selectedNumber(date);
           }
           return (
             <TouchableOpacity
-              key={number}
+              key={date.getDate()}
               onPress={() => {
-                if (!isFrom) {
-                  props.onOutboundSelect(/* format number to ISO string date */);
-                  setIsFrom(number);
+                if (!props.outbound) {
+                  props.onOutboundSelect(date);
                 }
-                if (isFrom && !isTo && number > isFrom) setIsTo(number);
-                if (isFrom && !isTo && number < isFrom) setIsFrom(number);
-                if (isFrom && isTo) {
-                  setIsFrom(number);
-                  setIsTo(null);
+                if (
+                  props.outbound &&
+                  !props.inbound &&
+                  moment(date).isAfter(props.outbound)
+                )
+                  props.onInboundSelect(date);
+                if (
+                  props.outbound &&
+                  !props.inbound &&
+                  moment(date).isBefore(props.outbound)
+                )
+                  props.onOutboundSelect(date);
+                if (props.outbound && props.inbound) {
+                  props.onOutboundSelect(date);
+                  props.onInboundSelect(null);
                 }
               }}
               activeOpacity={0.8}
@@ -116,15 +138,15 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
               <View
                 style={[
                   styles.alignCenter,
-                  isInRange(number)
+                  isInRange(date)
                     ? {
                         backgroundColor: 'rgba(35, 61, 189, 0.2)',
                       }
                     : {},
                 ]}>
                 <View style={[styles.numberContainer]}>
-                  <Text key={number} style={styles.numberText}>
-                    {number.toString()}
+                  <Text key={date.getDate()} style={styles.numberText}>
+                    {date.getDate().toString()}
                   </Text>
                 </View>
               </View>

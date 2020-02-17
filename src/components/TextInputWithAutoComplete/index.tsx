@@ -26,9 +26,7 @@ const TextInputWithAutoComplete = (props: Props) => {
             ? formatPlaceIdAndName(props.input.value)
             : props.input.query
         }
-        onChangeText={val => {
-          props.onChangeText(val);
-        }}
+        onChangeText={props.onChangeText}
       />
       <AutoCompletePlaces
         query={props.input.query}
