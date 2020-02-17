@@ -1,6 +1,5 @@
 import { Place } from '../Backend/types';
 import { PermissionsAndroid, Platform } from 'react-native';
-import Geolocation from 'react-native-geolocation-service';
 import { ThunkDispatch } from 'redux-thunk';
 import { Action } from 'redux';
 import { AppState } from '../store';
@@ -42,13 +41,7 @@ export const setPermissions = () => {
   return async (dispatch: ThunkDispatch<AppState, any, Action>) => {
     let hasPermissions = false;
     if (Platform.OS === 'android') {
-      const request = await PermissionsAndroid.request(
-        'android.permission.ACCESS_FINE_LOCATION',
-      );
-      hasPermissions = request === 'granted';
     } else {
-      // TODO: iOS Permissions
-      // const authorization = await Geolocation.requestAuthorization();
     }
     dispatch({
       type: SET_PERMISSIONS,
@@ -60,33 +53,7 @@ export const setPermissions = () => {
 };
 
 export const getCurrentPosition = () => {
-  return async (dispatch: ThunkDispatch<AppState, any, Action>) => {
-    Geolocation.getCurrentPosition(
-      position => {
-        dispatch({
-          type: SET_POSITION,
-          payload: {
-            position,
-          },
-        });
-      },
-      error => {
-        // See error code charts below.
-        console.log(error.code, error.message);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-    );
-  };
+  return async (dispatch: ThunkDispatch<AppState, any, Action>) => {};
 };
 
 export default localisationReducer;
-/*  Geolocation.getCurrentPosition(
-      position => {
-        console.log(position);
-      },
-      error => {
-        // See error code charts below.
-        console.log(error.code, error.message);
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
-    ); */

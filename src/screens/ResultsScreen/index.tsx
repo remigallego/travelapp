@@ -21,12 +21,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FlightCard, { BadgeType } from './FlightCard';
 import { useSelector } from '../../store';
 import TextMedium from '../../components/TextMedium';
-import {
-  findCheapestItinerary,
-  getCurrencySymbol,
-  findFastestLegId,
-  findFastestItineraries,
-} from '../../utils/results';
+import { getCurrencySymbol } from '../../utils/results';
 import { formatPlaceId } from '../../utils/places';
 import { selectResults } from '../../reducers/results';
 import { Itinerary } from '../../Backend/types';
