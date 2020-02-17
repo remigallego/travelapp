@@ -2,10 +2,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AppState } from '../store';
 import { Action } from 'redux';
 import { Place, SessionsOpts } from '../Backend/types';
-import {
-  resetOnboardingDestinationPlaces,
-  resetOnboardingOriginPlaces,
-} from './onboardingSearch';
+import { resetOnboardingPlaces } from './onboardingSearch';
 import Backend from '../Backend';
 import { setKey, toggleSessionLoading } from './session';
 import { setResults } from './results';
@@ -68,7 +65,7 @@ const queryReducer = (state: QueryState = initialState, action: any) => {
 
 export const setOrigin = (origin: Place) => {
   return (dispatch: ThunkDispatch<AppState, any, Action>) => {
-    dispatch(resetOnboardingOriginPlaces());
+    dispatch(resetOnboardingPlaces('origin'));
     return dispatch({
       type: SET_ORIGIN,
       payload: {
@@ -80,7 +77,7 @@ export const setOrigin = (origin: Place) => {
 
 export const setDestination = (destination: Place) => {
   return (dispatch: ThunkDispatch<AppState, any, Action>) => {
-    dispatch(resetOnboardingDestinationPlaces());
+    dispatch(resetOnboardingPlaces('destination'));
     return dispatch({
       type: SET_DESTINATION,
       payload: {

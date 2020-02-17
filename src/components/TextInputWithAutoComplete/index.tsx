@@ -3,13 +3,11 @@ import SearchInput from './SearchInput';
 import AutoCompletePlaces from './AutoCompletePlaces';
 import { Place } from '../../Backend/types';
 import { StyleSheet } from 'react-native';
+import { InputType, InputState } from '../../reducers/onboardingSearch';
+import { formatPlaceIdAndName } from '../../utils/places';
 
 interface Props {
-  loading: boolean;
-  inputValue: string;
-  query: string;
-  values: Place[];
-  placeholder: string;
+  input: InputState<InputType>;
   onPressItem: (val: Place) => void;
   onChangeText: (val: string) => void;
   onFocus?: () => void;
@@ -20,18 +18,22 @@ const TextInputWithAutoComplete = (props: Props) => {
     <>
       <SearchInput
         style={styles.searchInputStyle}
-        loading={props.loading}
+        loading={props.input.loading}
         onFocus={props.onFocus}
-        placeholder={props.placeholder}
-        value={props.inputValue}
+        placeholder={props.input.type}
+        value={
+          props.input.value
+            ? formatPlaceIdAndName(props.input.value)
+            : props.input.query
+        }
         onChangeText={val => {
           props.onChangeText(val);
         }}
       />
       <AutoCompletePlaces
-        query={props.query}
-        values={props.values}
-        loading={props.loading}
+        query={props.input.query}
+        values={props.input.places}
+        loading={props.input.loading}
         onPressItem={val => props.onPressItem(val)}
       />
     </>

@@ -16,18 +16,14 @@ import {
   NavigationParams,
 } from 'react-navigation';
 import {
-  setOnboardingOriginQuery,
-  setOnboardingDestinationQuery,
-  setOnboardingDestinationPlaces,
-  setOnboardingOriginPlaces,
-  setOnboardingDestination,
-  setOnboardingOrigin,
-  resetOnboardingDestinationPlaces,
-  resetOnboardingOriginPlaces,
+  setOnboardingQuery,
+  setOnboardingValue,
+  setOnboardingPlaces,
+  resetOnboardingPlaces,
+  InputType,
 } from '../../reducers/onboardingSearch';
 import { useDispatch } from 'react-redux';
 import { useSelector } from '../../store';
-import { formatPlaceIdAndName } from '../../utils/places';
 import { setDestination, setOrigin } from '../../reducers/query';
 import { Place } from '../../Backend/types';
 import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplete';
@@ -39,7 +35,8 @@ interface Props {
 const OnboardingScreen: (props: Props) => ReactElement = props => {
   const dispatch = useDispatch();
   const { origin, destination } = useSelector(state => state.onboardingSearch);
-  const validateAndNavigateToNextScreen = (
+
+  const setValuesAndNavigateToNextScreen = (
     originValue: Place,
     destinationValue: Place,
   ) => {
@@ -49,32 +46,33 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
   };
 
   const resetPlaces = () => {
-    dispatch(resetOnboardingOriginPlaces());
-    dispatch(resetOnboardingDestinationPlaces());
+    dispatch(resetOnboardingPlaces(origin.type));
+    dispatch(resetOnboardingPlaces(destination.type));
+  };
+
+  const handleChangeText = (val: string, type: InputType) => {
+    dispatch(setOnboardingQuery(val, type));
+    dispatch(setOnboardingPlaces(type)); // TODO: Figure out throttle/debounce
+  };
+
+  const handlePressItem = (val: Place, type: InputType) => {
+    dispatch(setOnboardingValue(val, type));
+    if (type === 'destination' && origin.value) {
+      setValuesAndNavigateToNextScreen(origin.value, val);
+    }
+    if (type === 'origin' && destination.value) {
+      setValuesAndNavigateToNextScreen(origin.value, val);
+    }
   };
 
   const renderOriginInput = () => {
     return (
       <View style={styles.originContainer}>
         <TextInputWithAutoComplete
-          placeholder={'Origin'}
-          query={origin.query}
-          values={origin.places}
-          loading={origin.loading}
+          input={origin}
           onFocus={resetPlaces}
-          inputValue={
-            origin.value ? formatPlaceIdAndName(origin.value) : origin.query
-          }
-          onChangeText={val => {
-            dispatch(setOnboardingOriginQuery(val));
-            dispatch(setOnboardingOriginPlaces()); // TODO: Figure out throttle/debounce
-          }}
-          onPressItem={val => {
-            dispatch(setOnboardingOrigin(val));
-            if (destination.value) {
-              validateAndNavigateToNextScreen(val, destination.value);
-            }
-          }}
+          onChangeText={val => handleChangeText(val, origin.type)}
+          onPressItem={val => handlePressItem(val, origin.type)}
         />
       </View>
     );
@@ -84,26 +82,10 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     return (
       <View style={styles.destinationContainer}>
         <TextInputWithAutoComplete
-          placeholder={'Destination'}
-          query={destination.query}
-          values={destination.places}
-          loading={destination.loading}
+          input={destination}
           onFocus={resetPlaces}
-          inputValue={
-            destination.value
-              ? formatPlaceIdAndName(destination.value)
-              : destination.query
-          }
-          onChangeText={val => {
-            dispatch(setOnboardingDestinationQuery(val));
-            dispatch(setOnboardingDestinationPlaces()); // TODO: Figure out throttle/debounce
-          }}
-          onPressItem={val => {
-            dispatch(setOnboardingDestination(val));
-            if (origin.value) {
-              validateAndNavigateToNextScreen(origin.value, val);
-            }
-          }}
+          onChangeText={val => handleChangeText(val, destination.type)}
+          onPressItem={val => handlePressItem(val, destination.type)}
         />
       </View>
     );

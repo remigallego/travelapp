@@ -4,29 +4,31 @@ import { Action } from 'redux';
 import Backend from '../Backend';
 import { Place } from '../Backend/types';
 
+export type InputType = 'origin' | 'destination';
+
+export interface InputState<T> {
+  type: T;
+  value: Place;
+  query: string;
+  places: Place[];
+  loading: boolean;
+}
+
 export interface OnboardingSearchState {
-  origin: {
-    value: Place;
-    query: string;
-    places: Place[];
-    loading: boolean;
-  };
-  destination: {
-    value: Place;
-    query: string;
-    places: Place[];
-    loading: boolean;
-  };
+  origin: InputState<'origin'>;
+  destination: InputState<'destination'>;
 }
 
 const initialState: OnboardingSearchState = {
   origin: {
+    type: 'origin',
     value: null,
     query: '',
     places: [],
     loading: false,
   },
   destination: {
+    type: 'destination',
     value: null,
     query: '',
     places: [],
@@ -34,205 +36,125 @@ const initialState: OnboardingSearchState = {
   },
 };
 
-const SET_ONBOARDING_ORIGIN = 'SET_ONBOARDING_ORIGIN';
-const SET_ONBOARDING_DESTINATION = 'SET_ONBOARDING_DESTINATION';
-const TOGGLE_ONBOARDING_ORIGIN_LOADING = 'TOGGLE_ONBOARDING_ORIGIN_LOADING';
-const TOGGLE_ONBOARDING_DESTINATION_LOADING =
-  'TOGGLE_ONBOARDING_DESTINATION_LOADING';
-const SET_ONBOARDING_ORIGIN_QUERY = 'SET_ONBOARDING_ORIGIN_QUERY';
-const SET_ONBOARDING_DESTINATION_QUERY = 'SET_ONBOARDING_DESTINATION_QUERY';
-const SET_ONBOARDING_ORIGIN_PLACES = 'SET_ONBOARDING_ORIGIN_PLACES';
-const SET_ONBOARDING_DESTINATION_PLACES = 'SET_ONBOARDING_DESTINATION_PLACES';
+const SET_ONBOARDING_QUERY = 'SET_ONBOARDING_QUERY';
+const TOGGLE_ONBOARDING_LOADING = 'TOGGLE_ONBOARDING_LOADING';
+const SET_ONBOARDING_VALUE = 'SET_ONBOARDING_VALUE';
+const SET_ONBOARDING_PLACES = 'SET_ONBOARDING_PLACES';
 
 const onboardingSearchReducer = (
   state: OnboardingSearchState = initialState,
   action: any,
 ) => {
   switch (action.type) {
-    case SET_ONBOARDING_ORIGIN:
+    case SET_ONBOARDING_QUERY: {
+      const previousState = state[action.payload.type as InputType];
       return {
         ...state,
-        origin: {
-          ...state.origin,
-          value: action.payload.origin,
+        [action.payload.type]: {
+          ...previousState,
+          query: action.payload.query,
         },
       };
-    case SET_ONBOARDING_DESTINATION:
+    }
+    case TOGGLE_ONBOARDING_LOADING: {
+      const previousState = state[action.payload.type as InputType];
       return {
         ...state,
-        destination: {
-          ...state.destination,
-          value: action.payload.destination,
-        },
-      };
-    case TOGGLE_ONBOARDING_ORIGIN_LOADING:
-      return {
-        ...state,
-        origin: {
-          ...state.origin,
+        [action.payload.type]: {
+          ...previousState,
           loading: action.payload.loading,
         },
       };
-    case TOGGLE_ONBOARDING_DESTINATION_LOADING:
+    }
+    case SET_ONBOARDING_VALUE: {
+      const previousState = state[action.payload.type as InputType];
       return {
         ...state,
-        destination: {
-          ...state.destination,
-          loading: action.payload.loading,
+        [action.payload.type]: {
+          ...previousState,
+          value: action.payload.value,
         },
       };
-    case SET_ONBOARDING_ORIGIN_QUERY:
+    }
+    case SET_ONBOARDING_PLACES: {
+      const previousState = state[action.payload.type as InputType];
       return {
         ...state,
-        origin: {
-          ...state.origin,
-          query: action.payload.originQuery,
+        [action.payload.type]: {
+          ...previousState,
+          places: action.payload.places,
         },
       };
-    case SET_ONBOARDING_DESTINATION_QUERY:
-      return {
-        ...state,
-        destination: {
-          ...state.destination,
-          query: action.payload.destinationQuery,
-        },
-      };
-    case SET_ONBOARDING_ORIGIN_PLACES:
-      return {
-        ...state,
-        origin: {
-          ...state.origin,
-          places: action.payload.originPlaces,
-        },
-      };
-    case SET_ONBOARDING_DESTINATION_PLACES:
-      return {
-        ...state,
-        destination: {
-          ...state.destination,
-          places: action.payload.destinationPlaces,
-        },
-      };
+    }
     default:
       return state;
   }
 };
 
-export const setOnboardingOrigin = (origin: Place) => {
-  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
-    dispatch(resetOnboardingOriginPlaces());
-    return dispatch({
-      type: SET_ONBOARDING_ORIGIN,
-      payload: {
-        origin,
-      },
-    });
-  };
-};
-
-export const setOnboardingDestination = (destination: Place) => {
-  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
-    dispatch(resetOnboardingDestinationPlaces());
-    return dispatch({
-      type: SET_ONBOARDING_DESTINATION,
-      payload: {
-        destination,
-      },
-    });
-  };
-};
-
-export const toggleOnboardingOriginLoading = (loading: boolean) => ({
-  type: TOGGLE_ONBOARDING_ORIGIN_LOADING,
+export const toggleOnboardingLoading = (loading: boolean, type: InputType) => ({
+  type: TOGGLE_ONBOARDING_LOADING,
   payload: {
     loading,
+    type,
   },
 });
 
-export const toggleOnboardingDestinationLoading = (loading: boolean) => ({
-  type: TOGGLE_ONBOARDING_DESTINATION_LOADING,
-  payload: {
-    loading,
-  },
-});
-
-export const setOnboardingOriginQuery = (originQuery: string) => (
+export const setOnboardingQuery = (query: string, type: InputType) => (
   dispatch: ThunkDispatch<AppState, any, Action>,
 ) => {
-  dispatch(setOnboardingOrigin(null));
+  dispatch(setOnboardingValue(null, type));
   dispatch({
-    type: SET_ONBOARDING_ORIGIN_QUERY,
+    type: SET_ONBOARDING_QUERY,
     payload: {
-      originQuery,
+      query,
+      type,
     },
   });
 };
 
-export const setOnboardingDestinationQuery = (destinationQuery: string) => (
-  dispatch: ThunkDispatch<AppState, any, Action>,
-) => {
-  dispatch(setOnboardingDestination(null));
-  dispatch({
-    type: SET_ONBOARDING_DESTINATION_QUERY,
-    payload: {
-      destinationQuery,
-    },
-  });
+export const setOnboardingValue = (value: Place, type: InputType) => {
+  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
+    dispatch(resetOnboardingPlaces(type));
+    return dispatch({
+      type: SET_ONBOARDING_VALUE,
+      payload: {
+        value,
+        type,
+      },
+    });
+  };
 };
 
-export const setOnboardingOriginPlaces = () => {
+export const setOnboardingPlaces = (type: InputType) => {
   return async (
     dispatch: ThunkDispatch<AppState, any, Action>,
     getState: () => AppState,
   ) => {
-    if (getState().onboardingSearch.origin.loading) {
+    if (getState().onboardingSearch[type].loading) {
       return;
     }
-    dispatch(toggleOnboardingOriginLoading(true));
-    const query = getState().onboardingSearch.origin.query;
-    const originPlaces = await Backend.getPlaces(query);
+    dispatch(toggleOnboardingLoading(true, type));
+
+    const query = getState().onboardingSearch[type].query;
+    const places = await Backend.getPlaces(query);
+
     dispatch({
-      type: SET_ONBOARDING_ORIGIN_PLACES,
+      type: SET_ONBOARDING_PLACES,
       payload: {
-        originPlaces,
+        places,
+        type,
       },
     });
-    dispatch(toggleOnboardingOriginLoading(false));
+
+    dispatch(toggleOnboardingLoading(false, type));
   };
 };
 
-export const setOnboardingDestinationPlaces = () => {
-  return async (
-    dispatch: ThunkDispatch<AppState, any, Action>,
-    getState: () => AppState,
-  ) => {
-    if (getState().onboardingSearch.destination.loading) {
-      return;
-    }
-    dispatch(toggleOnboardingDestinationLoading(true));
-    const query = getState().onboardingSearch.destination.query;
-    const destinationPlaces = await Backend.getPlaces(query);
-    dispatch({
-      type: SET_ONBOARDING_DESTINATION_PLACES,
-      payload: {
-        destinationPlaces,
-      },
-    });
-    dispatch(toggleOnboardingDestinationLoading(false));
-  };
-};
-
-export const resetOnboardingOriginPlaces = () => ({
-  type: SET_ONBOARDING_ORIGIN_PLACES,
+export const resetOnboardingPlaces = (type: InputType) => ({
+  type: SET_ONBOARDING_PLACES,
   payload: {
-    originPlaces: new Array(0),
-  },
-});
-
-export const resetOnboardingDestinationPlaces = () => ({
-  type: SET_ONBOARDING_DESTINATION_PLACES,
-  payload: {
-    destinationPlaces: new Array(0),
+    places: new Array(0),
+    type,
   },
 });
 
