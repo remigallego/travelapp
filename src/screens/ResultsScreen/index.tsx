@@ -6,6 +6,7 @@ import {
   Linking,
   TouchableOpacity,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ import {
   NavigationScreenProp,
   NavigationState,
   NavigationParams,
+  FlatList,
 } from 'react-navigation';
 import Headline from '../../components/Headline';
 import HorizontalCarousel from '../../components/HorizontalCarousel';
@@ -36,8 +38,11 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
   const outboundDate = useSelector(state => state.query.outboundDate);
   const inboundDate = useSelector(state => state.query.inboundDate);
   const [selectedDay, selectDay] = useState(moment(outboundDate));
+  const [ref, setRef] = useState();
 
-  const generateDays = date => {
+  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+
+  const generateDays = (date: Date) => {
     return [
       moment(date).subtract('3', 'day'),
       moment(date).subtract('2', 'day'),
@@ -79,94 +84,120 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     if (itineraries?.length === 0)
       return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
 
-    return itineraries.map((itinerary, index) => {
-      const outboundLeg = results.Legs.find(
-        val => val.Id === itinerary.OutboundLegId,
-      );
-      const inboundLeg = results.Legs.find(
-        val => val.Id === itinerary.InboundLegId,
-      );
-
-      const getBadgeType = () => {
-        if (index === 0) {
-          return BadgeType.CHEAPEST;
-        }
-        /*   if (itinerary.OutboundLegId === fastestId) {
+    const getBadgeType = (index: number) => {
+      if (index === 0) {
+        return BadgeType.CHEAPEST;
+      }
+      /*   if (itinerary.OutboundLegId === fastestId) {
           return BadgeType.FASTEST;
         } */
-        return BadgeType.NONE;
-      };
-      return (
-        <>
-          <View style={{ marginTop: 40 }}>
-            <TouchableOpacity
-              onPress={() => {
-                Linking.openURL(itinerary.PricingOptions[0].DeeplinkUrl);
-              }}>
-              <FlightCard
-                price={`${itinerary.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
-                  results,
-                )}`}
-                badgeType={getBadgeType()}
-                outboundLeg={outboundLeg}
-                inboundLeg={inboundLeg}
-              />
-            </TouchableOpacity>
-          </View>
-        </>
-      );
-    });
+      return BadgeType.NONE;
+    };
+    return (
+      <FlatList
+        data={itineraries}
+        renderItem={({ item, index }) => {
+          const outboundLeg = results.Legs.find(
+            val => val.Id === item.OutboundLegId,
+          );
+          const inboundLeg = results.Legs.find(
+            val => val.Id === item.InboundLegId,
+          );
+          return (
+            <>
+              <View style={{ marginTop: 40 }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
+                  }}>
+                  <FlightCard
+                    price={`${item.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
+                      results,
+                    )}`}
+                    badgeType={getBadgeType(index)}
+                    outboundLeg={outboundLeg}
+                    inboundLeg={inboundLeg}
+                  />
+                </TouchableOpacity>
+              </View>
+            </>
+          );
+        }}
+      />
+    );
   };
+
+  const renderHeader = () => (
+    <>
+      <Animated.View
+        style={{
+          backgroundColor: colors.grey,
+          paddingBottom: 10,
+          elevation: scrollY.interpolate({
+            inputRange: [0, 250],
+            outputRange: [0, 10],
+            extrapolate: 'clamp',
+          }),
+          height: scrollY.interpolate({
+            inputRange: [0, 250],
+            outputRange: [180, 150],
+            extrapolate: 'clamp',
+          }),
+        }}>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => ref.scrollTo({ y: 0, animated: true })}>
+          <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
+            {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+              query.destinationPlace,
+            )}`}
+          </Headline>
+        </TouchableOpacity>
+        <HorizontalCarousel
+          days={generateDays(outboundDate)}
+          selectedDay={moment(outboundDate)}
+          selectDay={day => {
+            dispatch(setOutboundToQuery(day.toDate()));
+            selectDay(day);
+          }}
+        />
+        {query.inboundDate && (
+          <HorizontalCarousel
+            style={{ marginTop: 10 }}
+            days={generateDays(inboundDate)}
+            selectedDay={moment(inboundDate)}
+            selectDay={day => {
+              dispatch(setInboundToQuery(day.toDate()));
+              selectDay(day);
+            }}
+          />
+        )}
+      </Animated.View>
+    </>
+  );
 
   return (
     <SafeAreaView style={styles.screen}>
-      <View>
-        <ScrollView
-          style={{ marginVertical: 20 }}
-          stickyHeaderIndices={[1]}
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}>
-          <StatusBar
-            backgroundColor={colors.backgroundBlue}
-            barStyle={'dark-content'}
-          />
-          <View style={{ backgroundColor: colors.grey, paddingBottom: 10 }}>
-            <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
-              {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
-                query.destinationPlace,
-              )}`}
-            </Headline>
-            <HorizontalCarousel
-              days={generateDays(outboundDate)}
-              selectedDay={moment(outboundDate)}
-              selectDay={day => {
-                dispatch(setOutboundToQuery(day.toDate()));
-                selectDay(day);
-              }}
-            />
-            <View style={{ flex: 1, marginTop: 10 }}>
-              {query.inboundDate && (
-                <HorizontalCarousel
-                  days={generateDays(inboundDate)}
-                  selectedDay={moment(inboundDate)}
-                  selectDay={day => {
-                    dispatch(setInboundToQuery(day.toDate()));
-                    selectDay(day);
-                  }}
-                />
-              )}
-            </View>
-          </View>
-
-          <>
-            <View style={styles.container}>
-              {loading && renderLoading()}
-              {!loading && renderResults(results.Itineraries.slice(0, 5))}
-            </View>
-          </>
-        </ScrollView>
-      </View>
+      <StatusBar
+        backgroundColor={colors.backgroundBlue}
+        barStyle={'dark-content'}
+      />
+      {loading && renderLoading()}
+      <ScrollView
+        ref={r => setRef(r)}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={0}
+        stickyHeaderIndices={[0]}
+        onScroll={Animated.event([
+          {
+            nativeEvent: { contentOffset: { y: scrollY } },
+          },
+        ])}>
+        {renderHeader()}
+        <View style={{ flex: 1 }}>
+          {!loading && renderResults(results.Itineraries.slice(0, 50))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -184,9 +215,9 @@ const styles = StyleSheet.create({
   smallText: { fontSize: 18 },
   blackText: { color: colors.black },
   container: {
-    flex: 1,
-    height: '100%',
+    flexGrow: 1,
     paddingHorizontal: 20,
+    borderWidth: 1,
     flexDirection: 'column',
   },
   smallMarginTop: {
