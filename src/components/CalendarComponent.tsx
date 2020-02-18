@@ -22,19 +22,17 @@ interface Props extends ViewProps {
 }
 
 const CalendarComponent: (props: Props) => ReactElement = props => {
-  const [animatedRange, setIsRange] = useState(new Animated.Value(0));
+  const [rangeAnimation, setIsRange] = useState(new Animated.Value(0));
+  const [selectAnimation, setSelect] = useState(new Animated.Value(0));
 
   useLayoutEffect(() => {
     if (props.inbound && props.outbound) {
-      Animated.timing(animatedRange, {
+      Animated.timing(rangeAnimation, {
         toValue: 100,
         duration: 500,
       }).start();
     } else {
-      Animated.timing(animatedRange, {
-        toValue: 0,
-        duration: 0,
-      }).start();
+      rangeAnimation.setValue(0);
     }
   }, [props.inbound, props.outbound]);
 
@@ -79,38 +77,71 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
     const isInRange = (date: Date) =>
       moment(date).isBetween(props.outbound, props.inbound);
 
-    const interpolatedBgColor = animatedRange.interpolate({
-      inputRange: [0, 40, 100],
+    const interpolatedBgColor = rangeAnimation.interpolate({
+      inputRange: [0, 10, 20, 60, 100],
       outputRange: [
         'rgba(35, 61, 189, 0)',
         'rgba(35, 61, 189, 0)',
+        'rgba(35, 61, 189, 0.3)',
+        'rgba(35, 61, 189, 0.3)',
         'rgba(35, 61, 189, 0.2)',
       ],
     });
+
+    const interpolatedWidth = selectAnimation.interpolate({
+      inputRange: [0, 10, 20, 60, 100],
+      outputRange: ['80%', '80%', '90%', '90%', '80%'],
+    });
+
+    const handleOutboundSelect = (date: Date) => {
+      selectAnimation.setValue(0);
+      console.log(selectAnimation);
+      Animated.timing(selectAnimation, {
+        toValue: 100,
+        duration: 500,
+      }).start();
+      props.onOutboundSelect(date);
+    };
+    const handleInboundSelect = (date: Date) => {
+      selectAnimation.setValue(0);
+      Animated.timing(selectAnimation, {
+        toValue: 100,
+        duration: 500,
+      }).start();
+
+      props.onInboundSelect(date);
+    };
 
     const selectedNumber = (date: Date) => {
       return (
         <TouchableOpacity
           activeOpacity={1}
-          onPress={() => {
+          onPressIn={() => {
             if (
               (props.outbound && moment(date).isSame(props.outbound)) ||
               (props.inbound && moment(date).isSame(props.inbound))
             ) {
-              props.onOutboundSelect(null);
-              props.onInboundSelect(null);
+              handleOutboundSelect(null);
+              handleInboundSelect(null);
             }
           }}
           style={styles.item}
           key={date.toISOString()}>
           <View style={styles.alignCenter}>
-            <View style={[styles.numberContainer, styles.selectedCircle]}>
+            <Animated.View
+              style={[
+                styles.numberContainer,
+                styles.selectedCircle,
+                {
+                  width: interpolatedWidth,
+                },
+              ]}>
               <Text
                 key={date.getDay()}
                 style={[styles.numberText, styles.selectedText]}>
                 {date.getDate()}
               </Text>
-            </View>
+            </Animated.View>
             <Animated.View
               style={[
                 props.outbound?.getDate() && props.inbound?.getDate()
@@ -140,28 +171,28 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
           return (
             <TouchableOpacity
               key={date.getDate()}
-              onPress={() => {
+              onPressIn={() => {
                 if (!props.outbound) {
-                  props.onOutboundSelect(date);
+                  handleOutboundSelect(date);
                 }
                 if (
                   props.outbound &&
                   !props.inbound &&
                   moment(date).isAfter(props.outbound)
                 )
-                  props.onInboundSelect(date);
+                  handleInboundSelect(date);
                 if (
                   props.outbound &&
                   !props.inbound &&
                   moment(date).isBefore(props.outbound)
                 )
-                  props.onOutboundSelect(date);
+                  handleOutboundSelect(date);
                 if (props.outbound && props.inbound) {
-                  props.onOutboundSelect(date);
-                  props.onInboundSelect(null);
+                  handleOutboundSelect(date);
+                  handleInboundSelect(null);
                 }
               }}
-              activeOpacity={0.8}
+              activeOpacity={0.5}
               style={[styles.item]}>
               <Animated.View
                 style={[
@@ -217,12 +248,14 @@ const styles = StyleSheet.create({
   numberText: {
     color: colors.black,
     fontSize: 18,
+    
   },
   alignCenter: {
     height: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   item: {
     width: `${100 / 7}%`,
@@ -230,7 +263,6 @@ const styles = StyleSheet.create({
   },
   numberContainer: {
     width: '100%',
-    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -242,7 +274,7 @@ const styles = StyleSheet.create({
   },
   selectedCircle: {
     backgroundColor: 'blue',
-    width: '80%',
+
     aspectRatio: 1,
     borderRadius: 10000,
     shadowColor: '#000',
@@ -252,7 +284,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 1,
     shadowRadius: 6.68,
-    elevation: 11,
+    elevation: 8,
   },
   selectedText: { color: 'white' },
 });
