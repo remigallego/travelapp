@@ -127,54 +127,62 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     );
   };
 
-  const renderHeader = () => (
-    <>
-      <Animated.View
-        style={{
-          backgroundColor: colors.grey,
-          paddingBottom: 10,
-          elevation: scrollY.interpolate({
-            inputRange: [0, 250],
-            outputRange: [0, 10],
-            extrapolate: 'clamp',
-          }),
-          height: scrollY.interpolate({
-            inputRange: [0, 250],
-            outputRange: [180, 150],
-            extrapolate: 'clamp',
-          }),
-        }}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => ref.scrollTo({ y: 0, animated: true })}>
-          <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
-            {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
-              query.destinationPlace,
-            )}`}
-          </Headline>
-        </TouchableOpacity>
-        <HorizontalCarousel
-          days={generateDays(outboundDate)}
-          selectedDay={moment(outboundDate)}
-          selectDay={day => {
-            dispatch(setOutboundToQuery(day.toDate()));
-            selectDay(day);
-          }}
-        />
-        {query.inboundDate && (
+  const renderHeader = () => {
+    const isWithInbound = query.inboundDate !== null;
+
+    const inputHeight =
+      results.Itineraries.length <= 5 ? results.Itineraries.length * 40 : 250;
+    const maxHeight = isWithInbound ? 180 : 200;
+    const minHeight = isWithInbound ? 150 : 100;
+    return (
+      <>
+        <Animated.View
+          style={{
+            backgroundColor: colors.grey,
+            paddingBottom: 10,
+            elevation: scrollY.interpolate({
+              inputRange: [0, inputHeight],
+              outputRange: [0, 10],
+              extrapolate: 'clamp',
+            }),
+            height: scrollY.interpolate({
+              inputRange: [0, inputHeight],
+              outputRange: [maxHeight, minHeight],
+              extrapolate: 'clamp',
+            }),
+          }}>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => ref.scrollTo({ y: 0, animated: true })}>
+            <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
+              {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+                query.destinationPlace,
+              )}`}
+            </Headline>
+          </TouchableOpacity>
           <HorizontalCarousel
-            style={{ marginTop: 10 }}
-            days={generateDays(inboundDate)}
-            selectedDay={moment(inboundDate)}
+            days={generateDays(outboundDate)}
+            selectedDay={moment(outboundDate)}
             selectDay={day => {
-              dispatch(setInboundToQuery(day.toDate()));
+              dispatch(setOutboundToQuery(day.toDate()));
               selectDay(day);
             }}
           />
-        )}
-      </Animated.View>
-    </>
-  );
+          {query.inboundDate && (
+            <HorizontalCarousel
+              style={{ marginTop: 10 }}
+              days={generateDays(inboundDate)}
+              selectedDay={moment(inboundDate)}
+              selectDay={day => {
+                dispatch(setInboundToQuery(day.toDate()));
+                selectDay(day);
+              }}
+            />
+          )}
+        </Animated.View>
+      </>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
