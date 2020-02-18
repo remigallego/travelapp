@@ -6,6 +6,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import colors from '../colors';
 import Card from './Card';
@@ -21,8 +22,25 @@ interface Props extends ViewProps {
 }
 
 const CalendarComponent: (props: Props) => ReactElement = props => {
+  const [animatedRange, setIsRange] = useState(new Animated.Value(0));
+
+  useLayoutEffect(() => {
+    if (props.inbound && props.outbound) {
+      Animated.timing(animatedRange, {
+        toValue: 100,
+        duration: 500,
+      }).start();
+    } else {
+      Animated.timing(animatedRange, {
+        toValue: 0,
+        duration: 0,
+      }).start();
+    }
+  }, [props.inbound, props.outbound]);
+
   const renderLetters = () => {
     const daysStartWithSunday = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
     return (
       <View style={[styles.lettersContainer]}>
         {daysStartWithSunday.map((day, index) => (
@@ -61,6 +79,15 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
     const isInRange = (date: Date) =>
       moment(date).isBetween(props.outbound, props.inbound);
 
+    const interpolatedBgColor = animatedRange.interpolate({
+      inputRange: [0, 40, 100],
+      outputRange: [
+        'rgba(35, 61, 189, 0)',
+        'rgba(35, 61, 189, 0)',
+        'rgba(35, 61, 189, 0.2)',
+      ],
+    });
+
     const selectedNumber = (date: Date) => {
       return (
         <TouchableOpacity
@@ -70,7 +97,6 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
               (props.outbound && moment(date).isSame(props.outbound)) ||
               (props.inbound && moment(date).isSame(props.inbound))
             ) {
-              console.log('here');
               props.onOutboundSelect(null);
               props.onInboundSelect(null);
             }
@@ -85,10 +111,12 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
                 {date.getDate()}
               </Text>
             </View>
-            <View
+            <Animated.View
               style={[
                 props.outbound?.getDate() && props.inbound?.getDate()
-                  ? styles.absoluteBackgroundColor
+                  ? StyleSheet.compose(styles.absoluteBackgroundColor, {
+                      backgroundColor: interpolatedBgColor,
+                    })
                   : {},
                 date.getDate() === props.outbound?.getDate() && { right: 0 },
                 date.getDate() === props.inbound?.getDate() && { left: 0 },
@@ -135,12 +163,12 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
               }}
               activeOpacity={0.8}
               style={[styles.item]}>
-              <View
+              <Animated.View
                 style={[
                   styles.alignCenter,
                   isInRange(date)
                     ? {
-                        backgroundColor: 'rgba(35, 61, 189, 0.2)',
+                        backgroundColor: interpolatedBgColor,
                       }
                     : {},
                 ]}>
@@ -149,7 +177,7 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
                     {date.getDate().toString()}
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
             </TouchableOpacity>
           );
         })}
@@ -211,7 +239,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '50%',
     height: '100%',
-    backgroundColor: 'rgba(35, 61, 189, 0.2)',
   },
   selectedCircle: {
     backgroundColor: 'blue',
