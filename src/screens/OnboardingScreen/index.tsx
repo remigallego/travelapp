@@ -1,11 +1,11 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Image,
   StatusBar,
   TouchableWithoutFeedback,
-  TouchableOpacity,
+  Animated,
 } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
@@ -28,7 +28,7 @@ import { useSelector } from '../../store';
 import { setDestinationToQuery, setOriginToQuery } from '../../reducers/query';
 import { Place } from '../../Backend/types';
 import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplete';
-import TextMedium from '../../components/TextMedium';
+import ButtonComponent from '../../components/ButtonComponent';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -37,14 +37,31 @@ interface Props {
 const OnboardingScreen: (props: Props) => ReactElement = props => {
   const dispatch = useDispatch();
   const { origin, destination } = useSelector(state => state.onboardingSearch);
+  const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
+  const [shouldStartFadeAnim, setStartFadeAnim] = useState(false);
+
+  const interpolatedOpacity = fadeAnim.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, 1],
+  });
 
   const setValuesAndNavigateToNextScreen = (
     originValue: Place,
     destinationValue: Place,
   ) => {
+    setStartFadeAnim(true);
     dispatch(setOriginToQuery(originValue));
     dispatch(setDestinationToQuery(destinationValue));
-    props.navigation.navigate('Calendar');
+    Animated.timing(fadeAnim, {
+      toValue: 100,
+      duration: 300,
+    }).start(() => {
+      props.navigation.navigate('Calendar');
+      setTimeout(() => {
+        setStartFadeAnim(false);
+        fadeAnim.setValue(0);
+      }, 500);
+    });
   };
 
   const resetPlaces = () => {
@@ -54,17 +71,11 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
 
   const handleChangeText = (val: string, type: InputType) => {
     dispatch(setOnboardingQuery(val, type));
-    dispatch(setOnboardingPlaces(type)); // TODO: Figure out throttle/debounce
+    dispatch(setOnboardingPlaces(type));
   };
 
   const handlePressItem = (val: Place, type: InputType) => {
     dispatch(setOnboardingValue(val, type));
-    if (type === 'destination' && origin.value) {
-      setValuesAndNavigateToNextScreen(origin.value, val);
-    }
-    if (type === 'origin' && destination.value) {
-      setValuesAndNavigateToNextScreen(origin.value, val);
-    }
   };
 
   const renderOriginInput = () => {
@@ -110,21 +121,42 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar backgroundColor={colors.pink} barStyle={'light-content'} />
-      <View style={styles.container}>
+      <Animated.View style={[styles.container, {}]}>
         {renderHeadline()}
-        <View>
+        <View style={{}}>
           {renderOriginInput()}
           {renderDestinationInput()}
+          <ButtonComponent
+            color={colors.blue}
+            onPress={() => {
+              setValuesAndNavigateToNextScreen(origin.value, destination.value);
+            }}
+            disabled={!origin.value || !destination.value}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              top: 140,
+              zIndex: 1,
+            }}>
+            Search
+          </ButtonComponent>
         </View>
-      </View>
+      </Animated.View>
+
       <Image source={require('./background.jpeg')} style={styles.imageStyle} />
-      <TouchableOpacity
-        onPress={() => {
-          setValuesAndNavigateToNextScreen(origin.value, destination.value);
-        }}
-        style={{ position: 'absolute', bottom: 0, zIndex: 99999 }}>
-        <TextMedium>Next</TextMedium>
-      </TouchableOpacity>
+      {shouldStartFadeAnim && (
+        <Animated.Image
+          source={require('./background.jpeg')}
+          style={[
+            styles.imageStyle,
+            {
+              zIndex: 7,
+              opacity: interpolatedOpacity,
+            },
+          ]}
+        />
+      )}
+
       <TouchableWithoutFeedback
         onPress={_e => {
           resetPlaces();
@@ -170,14 +202,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    zIndex: 1,
+    zIndex: 2,
   },
-  originContainer: { position: 'absolute', width: '100%', zIndex: 2 },
+  originContainer: { position: 'absolute', width: '100%', zIndex: 3 },
   destinationContainer: {
     position: 'absolute',
     width: '100%',
     top: 60,
-    zIndex: 1,
+    zIndex: 2,
   },
   absoluteContainer: {
     zIndex: 0,
