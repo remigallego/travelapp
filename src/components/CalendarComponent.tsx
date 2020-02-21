@@ -23,7 +23,6 @@ interface Props extends ViewProps {
 
 const CalendarComponent: (props: Props) => ReactElement = props => {
   const [rangeAnimation, setIsRange] = useState(new Animated.Value(0));
-  const [selectAnimation, setSelect] = useState(new Animated.Value(0));
 
   useLayoutEffect(() => {
     if (props.inbound && props.outbound) {
@@ -88,27 +87,10 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
       ],
     });
 
-    const interpolatedWidth = selectAnimation.interpolate({
-      inputRange: [0, 10, 20, 60, 100],
-      outputRange: ['80%', '80%', '90%', '90%', '80%'],
-    });
-
     const handleOutboundSelect = (date: Date) => {
-      selectAnimation.setValue(0);
-      console.log(selectAnimation);
-      Animated.timing(selectAnimation, {
-        toValue: 100,
-        duration: 500,
-      }).start();
       props.onOutboundSelect(date);
     };
     const handleInboundSelect = (date: Date) => {
-      selectAnimation.setValue(0);
-      Animated.timing(selectAnimation, {
-        toValue: 100,
-        duration: 500,
-      }).start();
-
       props.onInboundSelect(date);
     };
 
@@ -133,7 +115,7 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
                 styles.numberContainer,
                 styles.selectedCircle,
                 {
-                  width: interpolatedWidth,
+                  width: '80%',
                 },
               ]}>
               <Text
@@ -248,7 +230,6 @@ const styles = StyleSheet.create({
   numberText: {
     color: colors.black,
     fontSize: 18,
-    
   },
   alignCenter: {
     height: '100%',

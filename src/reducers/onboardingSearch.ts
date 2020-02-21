@@ -137,8 +137,10 @@ export const toggleOnboardingLoading = (loading: boolean, type: InputType) => ({
 
 export const setOnboardingQuery = (query: string, type: InputType) => (
   dispatch: ThunkDispatch<AppState, any, Action>,
+  getState: () => AppState,
 ) => {
-  dispatch(setOnboardingValue(null, type));
+  if (getState().onboardingSearch[type].value)
+    dispatch(setOnboardingValue(null, type));
   dispatch({
     type: SET_ONBOARDING_QUERY,
     payload: {
@@ -166,9 +168,6 @@ export const setOnboardingPlaces = (type: InputType) => {
     dispatch: ThunkDispatch<AppState, any, Action>,
     getState: () => AppState,
   ) => {
-    if (getState().onboardingSearch[type].loading) {
-      return;
-    }
     dispatch(toggleOnboardingLoading(true, type));
 
     const query = getState().onboardingSearch[type].query;

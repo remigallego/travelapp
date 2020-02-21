@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement, useState, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -29,6 +29,9 @@ import { setDestinationToQuery, setOriginToQuery } from '../../reducers/query';
 import { Place } from '../../Backend/types';
 import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplete';
 import ButtonComponent from '../../components/ButtonComponent';
+import _ from 'lodash';
+
+const DEBOUNCE_DELAY = 500;
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -39,6 +42,19 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
   const { origin, destination } = useSelector(state => state.onboardingSearch);
   const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
   const [shouldStartFadeAnim, setStartFadeAnim] = useState(false);
+
+  const debouncedOriginQuery = useCallback(
+    _.debounce(() => dispatch(setOnboardingPlaces('origin')), DEBOUNCE_DELAY),
+    [],
+  );
+
+  const debouncedDestinationQuery = useCallback(
+    _.debounce(
+      () => dispatch(setOnboardingPlaces('destination')),
+      DEBOUNCE_DELAY,
+    ),
+    [],
+  );
 
   const interpolatedOpacity = fadeAnim.interpolate({
     inputRange: [0, 100],
@@ -60,7 +76,7 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
       setTimeout(() => {
         setStartFadeAnim(false);
         fadeAnim.setValue(0);
-      }, 500);
+      }, 300);
     });
   };
 
@@ -71,7 +87,8 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
 
   const handleChangeText = (val: string, type: InputType) => {
     dispatch(setOnboardingQuery(val, type));
-    dispatch(setOnboardingPlaces(type));
+    if (type === 'origin') debouncedOriginQuery();
+    if (type === 'destination') debouncedDestinationQuery();
   };
 
   const handlePressItem = (val: Place, type: InputType) => {
@@ -123,7 +140,7 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
       <StatusBar backgroundColor={colors.pink} barStyle={'light-content'} />
       <Animated.View style={[styles.container, {}]}>
         {renderHeadline()}
-        <View style={{}}>
+        <View style={styles.smallMarginTop}>
           {renderOriginInput()}
           {renderDestinationInput()}
           <ButtonComponent
@@ -132,12 +149,7 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
               setValuesAndNavigateToNextScreen(origin.value, destination.value);
             }}
             disabled={!origin.value || !destination.value}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              top: 140,
-              zIndex: 1,
-            }}>
+            style={styles.searchButton}>
             Search
           </ButtonComponent>
         </View>
@@ -145,19 +157,23 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
 
       <Image source={require('./background.jpeg')} style={styles.imageStyle} />
       {shouldStartFadeAnim && (
-        <Animated.Image
-          source={require('./background.jpeg')}
-          style={[
-            styles.imageStyle,
-            {
-              zIndex: 7,
-              opacity: interpolatedOpacity,
-            },
-          ]}
-        />
+        <>
+          <Animated.Image
+            source={require('./background.jpeg')}
+            style={[
+              styles.imageStyle,
+              {
+                zIndex: 7,
+                opacity: interpolatedOpacity,
+              },
+            ]}
+          />
+        </>
       )}
 
       <TouchableWithoutFeedback
+        // @ts-ignore
+        touchSoundDisabled={false}
         onPress={_e => {
           resetPlaces();
         }}>
@@ -175,13 +191,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.pink,
   },
   container: {
-    paddingTop: 30,
+    paddingTop: 40,
     paddingHorizontal: 20,
   },
   text: {
     color: 'white',
     fontSize: 24,
     fontFamily: 'Poppins-Medium',
+  },
+  searchButton: {
+    position: 'absolute',
+    width: '100%',
+    top: 140,
+    zIndex: 1,
+  },
+  smallMarginTop: {
+    marginTop: 10,
   },
   bold: {
     color: 'white',
@@ -191,6 +216,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     position: 'absolute',
     bottom: 0,
+    borderWidth: 1,
     zIndex: -1,
     width: '100%',
     height: '100%',

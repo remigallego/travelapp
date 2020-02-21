@@ -6,7 +6,7 @@ export const formatPlaceId = (place: Place) => {
 
 export const formatPlaceIdAndName = (place: Place) => {
   const id = formatPlaceId(place);
-  return `${id} - ${place.PlaceName}`;
+  return `${place.PlaceName} (${id})`;
 };
 
 export const isCity = (place: Place) => {

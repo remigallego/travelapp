@@ -43,6 +43,7 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
   return (
     <Card style={[styles.card, props.style]}>
       <ScrollView
+        nestedScrollEnabled={true}
         scrollEventThrottle={10}
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}>

@@ -51,6 +51,8 @@ const SET_ORIGIN_TO_QUERY = 'SET_ORIGIN_TO_QUERY';
 const SET_DESTINATION_TO_QUERY = 'SET_DESTINATION_TO_QUERY';
 const SET_INBOUND_TO_QUERY = 'SET_INBOUND_TO_QUERY';
 const SET_OUTBOUND_TO_QUERY = 'SET_OUTBOUND_TO_QUERY';
+const SET_ADULTS_TO_QUERY = 'SET_ADULTS_TO_QUERY';
+const SET_INFANTS_TO_QUERY = 'SET_INFANTS_TO_QUERY';
 
 const queryReducer = (state: QueryState = queryInitialState, action: any) => {
   switch (action.type) {
@@ -73,6 +75,16 @@ const queryReducer = (state: QueryState = queryInitialState, action: any) => {
       return {
         ...state,
         inboundDate: action.payload.date,
+      };
+    case SET_ADULTS_TO_QUERY:
+      return {
+        ...state,
+        adults: action.payload.adults,
+      };
+    case SET_INFANTS_TO_QUERY:
+      return {
+        ...state,
+        infants: action.payload.infants,
       };
     default:
       return state;
@@ -120,6 +132,30 @@ export const setInboundToQuery = (date: Date) => {
       type: SET_INBOUND_TO_QUERY,
       payload: {
         date,
+      },
+    });
+  };
+};
+
+export const setAdultsToQuery = (adults: number) => {
+  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
+    if (adults <= 0 || adults >= 10) return;
+    return dispatch({
+      type: SET_ADULTS_TO_QUERY,
+      payload: {
+        adults,
+      },
+    });
+  };
+};
+
+export const setInfantsToQuery = (infants: number) => {
+  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
+    if (infants < 0 || infants >= 10) return;
+    return dispatch({
+      type: SET_INFANTS_TO_QUERY,
+      payload: {
+        infants,
       },
     });
   };

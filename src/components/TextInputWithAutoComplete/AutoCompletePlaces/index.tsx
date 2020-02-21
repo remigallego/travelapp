@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   Animated,
+  Keyboard,
 } from 'react-native';
 import TextLight from '../../TextLight';
 import colors from '../../../colors';
@@ -48,14 +49,6 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
         <View style={{ marginLeft: 20 }}>
           {airportsOfThisCity.map(renderItem)}
         </View>
-      </View>
-    );
-  };
-
-  const renderLoading = () => {
-    return (
-      <View key={'loading'} style={[styles.itemContainer]}>
-        <TextLight style={[styles.loadingText]}>Loading...</TextLight>
       </View>
     );
   };
@@ -108,7 +101,10 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
         key={val.PlaceId}
         disabled={isCountry(val) || isCity(val)}
         style={styles.itemContainer}
-        onPress={() => onPressItem(val)}>
+        onPress={() => {
+          Keyboard.dismiss();
+          onPressItem(val);
+        }}>
         <FontAwesomeIcon icon={renderIcon(val)} size={16} style={styles.icon} />
         <TextLight style={[styles.itemText]}>
           {renderWithBoldQuery(placeName)}

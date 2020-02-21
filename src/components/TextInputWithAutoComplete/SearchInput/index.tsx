@@ -8,6 +8,7 @@ import {
 import colors from '../../../colors';
 import { TextInput } from 'react-native-gesture-handler';
 import { useAnimation } from 'react-native-animation-hooks';
+import TextMedium from '../../TextMedium';
 
 interface Props extends TextInputProps {
   loading: boolean;
@@ -92,6 +93,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.36,
     shadowRadius: 6.68,
-    elevation: 0,
+    elevation: 10,
   },
 });

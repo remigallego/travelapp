@@ -12,6 +12,7 @@ import TextSemiBold from './TextSemiBold';
 interface Props extends TouchableOpacityProps {
   children: string | ReactElement | ReactElement[];
   color?: string;
+  activeColor?: string;
 }
 
 const ButtonComponent: (props: Props) => ReactElement = props => {
@@ -32,22 +33,6 @@ const ButtonComponent: (props: Props) => ReactElement = props => {
       }}
       style={[styles.flexContainer, style]}
       {...otherProps}>
-      {/*  <Animated.View
-        style={{
-          height: '100%',
-          width: '100%',
-          borderRadius: 40,
-          backgroundColor: 'black',
-          position: 'absolute',
-          transform: [
-            {
-              scaleX: pressAnim.interpolate({
-                inputRange: [0, 100],
-                outputRange: [0, 100],
-              }),
-            },
-          ],
-        }}></Animated.View> */}
       <View
         style={[
           styles.container,
@@ -59,10 +44,12 @@ const ButtonComponent: (props: Props) => ReactElement = props => {
         <Animated.View
           style={{
             height: '100%',
-            backgroundColor: colors.black,
+            backgroundColor: colors.activeColor
+              ? colors.activeColor
+              : '#c2938f',
             opacity: pressAnim.interpolate({
               inputRange: [0, 100],
-              outputRange: [0, 0.1],
+              outputRange: [0, 0.4],
             }),
             width: pressAnim.interpolate({
               inputRange: [0, 100],
@@ -103,7 +90,6 @@ const styles = StyleSheet.create({
   container: {
     width: '50%',
     borderRadius: 40,
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
