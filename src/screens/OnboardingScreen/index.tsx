@@ -30,6 +30,7 @@ import { Place } from '../../Backend/types';
 import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplete';
 import ButtonComponent from '../../components/ButtonComponent';
 import _ from 'lodash';
+import SettingsModal from './SettingsModal';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -40,7 +41,7 @@ interface Props {
 const OnboardingScreen: (props: Props) => ReactElement = props => {
   const dispatch = useDispatch();
   const { origin, destination } = useSelector(state => state.onboardingSearch);
-  const [fadeAnim, setFadeAnim] = useState(new Animated.Value(0));
+  const [fadeAnim, _s] = useState(new Animated.Value(0));
   const [shouldStartFadeAnim, setStartFadeAnim] = useState(false);
 
   const debouncedOriginQuery = useCallback(
@@ -179,6 +180,8 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
         }}>
         <View style={styles.absoluteContainer} />
       </TouchableWithoutFeedback>
+
+      <SettingsModal />
     </SafeAreaView>
   );
 };

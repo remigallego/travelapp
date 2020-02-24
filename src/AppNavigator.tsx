@@ -6,6 +6,7 @@ import {
 } from 'react-navigation-stack';
 import Calendar from './screens/CalendarScreen';
 import ResultsScreen from './screens/ResultsScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 const MyTransition = {
   gestureDirection: 'horizontal',
@@ -52,6 +53,12 @@ const AppNavigator = createStackNavigator(
     },
     Results: {
       screen: ResultsScreen,
+      navigationOptions: {
+        header: () => null,
+      },
+    },
+    Settings: {
+      screen: SettingsScreen,
       navigationOptions: {
         header: () => null,
       },

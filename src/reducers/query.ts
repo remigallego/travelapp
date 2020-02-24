@@ -57,6 +57,7 @@ const SET_INBOUND_TO_QUERY = 'SET_INBOUND_TO_QUERY';
 const SET_OUTBOUND_TO_QUERY = 'SET_OUTBOUND_TO_QUERY';
 const SET_ADULTS_TO_QUERY = 'SET_ADULTS_TO_QUERY';
 const SET_INFANTS_TO_QUERY = 'SET_INFANTS_TO_QUERY';
+const SET_CURRENCY_TO_QUERY = 'SET_CURRENCY_TO_QUERY';
 
 const queryReducer = (state: QueryState = queryInitialState, action: any) => {
   switch (action.type) {
@@ -90,9 +91,25 @@ const queryReducer = (state: QueryState = queryInitialState, action: any) => {
         ...state,
         infants: action.payload.infants,
       };
+    case SET_CURRENCY_TO_QUERY:
+      return {
+        ...state,
+        currency: action.payload.currency,
+      };
     default:
       return state;
   }
+};
+
+export const setCurrencyToQuery = (currency: string) => {
+  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
+    return dispatch({
+      type: SET_CURRENCY_TO_QUERY,
+      payload: {
+        currency,
+      },
+    });
+  };
 };
 
 export const setOriginToQuery = (origin: Place) => {
