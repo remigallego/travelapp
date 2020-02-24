@@ -4,7 +4,11 @@ import { Action } from 'redux';
 import { Place, SessionsOpts } from '../Backend/types';
 import { resetOnboardingPlaces } from './onboardingSearch';
 import Backend from '../Backend';
-import { setKey, toggleSessionLoading } from './session';
+import {
+  setKey,
+  toggleSessionLoading,
+  toggleSessionLoadingInsideScreen,
+} from './session';
 import { setResults } from './results';
 import moment from 'moment';
 
@@ -188,6 +192,36 @@ export const createSession = () => {
     const results = await Backend.pollSession(key);
     dispatch(setResults(results));
     dispatch(toggleSessionLoading(false));
+  };
+};
+
+export const updateSession = () => {
+  return async (
+    dispatch: ThunkDispatch<AppState, any, Action>,
+    getState: () => AppState,
+  ) => {
+    dispatch(toggleSessionLoadingInsideScreen(true));
+
+    const craftOptions: () => SessionsOpts = () => {
+      const searchSession = getState().query;
+      let inboundDate = null;
+      if (searchSession.inboundDate) {
+        inboundDate = moment(searchSession.inboundDate).format(DATE_FORMAT);
+      }
+
+      return {
+        ...searchSession,
+        inboundDate,
+        outboundDate: moment(searchSession.outboundDate).format(DATE_FORMAT),
+        destinationPlace: searchSession.destinationPlace.PlaceId,
+        originPlace: searchSession.originPlace.PlaceId,
+      };
+    };
+    const key = await Backend.createSession(craftOptions());
+    dispatch(setKey(key));
+    const results = await Backend.pollSession(key);
+    dispatch(setResults(results));
+    dispatch(toggleSessionLoadingInsideScreen(false));
   };
 };
 

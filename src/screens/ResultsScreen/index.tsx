@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -28,7 +28,13 @@ import { formatPlaceId } from '../../utils/places';
 import { selectResults } from '../../reducers/results';
 import { Itinerary } from '../../Backend/types';
 import { useDispatch } from 'react-redux';
-import { setOutboundToQuery, setInboundToQuery } from '../../reducers/query';
+import {
+  setOutboundToQuery,
+  setInboundToQuery,
+  createSession,
+  updateSession,
+} from '../../reducers/query';
+import { toggleSessionLoadingInsideScreen } from '../../reducers/session';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -38,6 +44,7 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
   const outboundDate = useSelector(state => state.query.outboundDate);
   const inboundDate = useSelector(state => state.query.inboundDate);
   const [selectedDay, selectDay] = useState(moment(outboundDate));
+  const [carouselIsScrolled, setCarouselIsScrolled] = useState(false);
   const [ref, setRef] = useState();
 
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
@@ -57,6 +64,9 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
   const query = useSelector(state => state.query);
 
   const loading = useSelector(state => state.session.loading);
+  const loadingInsideScreen = useSelector(
+    state => state.session.loadingInsideScreen,
+  );
   const results = useSelector(selectResults);
 
   const dispatch = useDispatch();
@@ -81,6 +91,14 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
   };
 
   const renderResults = (itineraries: Itinerary[]) => {
+    if (loadingInsideScreen) {
+      return (
+        <View style={{ height: '100%', marginTop: 100 }}>
+          <ActivityIndicator size={70} color={colors.blue}></ActivityIndicator>
+        </View>
+      );
+    }
+
     if (itineraries?.length === 0)
       return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
 
@@ -105,7 +123,7 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
           );
           return (
             <>
-              <View style={{ marginTop: 40 }}>
+              <View style={{ marginTop: 30 }}>
                 <TouchableOpacity
                   onPress={() => {
                     Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
@@ -163,18 +181,26 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
           <HorizontalCarousel
             days={generateDays(outboundDate)}
             selectedDay={moment(outboundDate)}
+            enableScroll={!carouselIsScrolled}
             selectDay={day => {
+              if (moment(day.toDate()).isSame(outboundDate)) return;
+
+              setCarouselIsScrolled(true);
               dispatch(setOutboundToQuery(day.toDate()));
+              dispatch(updateSession());
               selectDay(day);
             }}
           />
           {query.inboundDate && (
             <HorizontalCarousel
               style={{ marginTop: 10 }}
+              enableScroll={!carouselIsScrolled}
               days={generateDays(inboundDate)}
               selectedDay={moment(inboundDate)}
               selectDay={day => {
+                if (moment(day.toDate()).isSame(inboundDate)) return;
                 dispatch(setInboundToQuery(day.toDate()));
+                dispatch(updateSession());
                 selectDay(day);
               }}
             />

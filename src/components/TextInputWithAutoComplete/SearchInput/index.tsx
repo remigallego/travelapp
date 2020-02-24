@@ -46,6 +46,7 @@ const SearchInput: (props: Props) => ReactElement = props => {
       )}
       <TextInput
         {...props}
+        autoCorrect={false}
         selectTextOnFocus
         style={styles.textInput}
         clearTextOnFocus={true}

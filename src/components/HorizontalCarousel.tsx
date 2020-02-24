@@ -14,14 +14,17 @@ interface Props extends TextProps {
   days: moment.Moment[];
   selectedDay: moment.Moment;
   selectDay: (d: moment.Moment) => void;
+  enableScroll: boolean;
 }
 
 const HorizontalCarousel: (props: Props) => ReactElement = props => {
   const [scrollViewRef, setScrollViewRef] = useState(null);
   const [width, setWidth] = useState(0);
+
   if (scrollViewRef) {
-    scrollViewRef.scrollTo({ x: width / 2 - 65 });
+    scrollViewRef.scrollTo({ x: width / 2 - 65, animated: true });
   }
+
   const renderDay = (day: moment.Moment, index: number) => {
     const isSelected = moment(day).isSame(props.selectedDay, 'day');
     return (
@@ -69,9 +72,10 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
 
   return (
     <ScrollView
-      onLayout={e => setWidth(e.nativeEvent.layout.width)}
+      onLayout={e => {
+        setWidth(e.nativeEvent.layout.width);
+      }}
       ref={r => setScrollViewRef(r)}
-      contentOffset={{ x: 130, y: 130 }}
       horizontal={true}
       scrollEventThrottle={10}
       style={[styles.scrollView, props.style]}
