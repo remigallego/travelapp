@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -17,6 +17,11 @@ interface Props extends TextProps {
 }
 
 const HorizontalCarousel: (props: Props) => ReactElement = props => {
+  const [scrollViewRef, setScrollViewRef] = useState(null);
+  const [width, setWidth] = useState(0);
+  if (scrollViewRef) {
+    scrollViewRef.scrollTo({ x: width / 2 - 65 });
+  }
   const renderDay = (day: moment.Moment, index: number) => {
     const isSelected = moment(day).isSame(props.selectedDay, 'day');
     return (
@@ -36,18 +41,6 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
               backgroundColor: isSelected ? colors.blue : colors.white,
             },
           ]}>
-          {/*  <TextMedium
-            style={[
-              styles.smallText,
-              {
-                color: isSelected ? colors.grey : colors.black,
-              },
-            ]}>
-            {day
-              .format('ddd dddd')
-              .toUpperCase()
-              .slice(0, 3)}
-          </TextMedium> */}
           <TextMedium
             style={[
               styles.bigText,
@@ -76,6 +69,8 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
 
   return (
     <ScrollView
+      onLayout={e => setWidth(e.nativeEvent.layout.width)}
+      ref={r => setScrollViewRef(r)}
       contentOffset={{ x: 130, y: 130 }}
       horizontal={true}
       scrollEventThrottle={10}
@@ -116,7 +111,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingBottom: 10
+    paddingBottom: 10,
   },
   smallText: {
     fontSize: 12,
