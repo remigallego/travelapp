@@ -6,6 +6,7 @@ import {
   StatusBar,
   TouchableWithoutFeedback,
   Animated,
+  Keyboard,
 } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
@@ -31,6 +32,11 @@ import TextInputWithAutoComplete from '../../components/TextInputWithAutoComplet
 import ButtonComponent from '../../components/ButtonComponent';
 import _ from 'lodash';
 import SettingsModal from './SettingsModal';
+import {
+  faPlaneDeparture,
+  faPlaneArrival,
+} from '@fortawesome/free-solid-svg-icons';
+import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -69,6 +75,8 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     setStartFadeAnim(true);
     dispatch(setOriginToQuery(originValue));
     dispatch(setDestinationToQuery(destinationValue));
+    dispatch(setInboundDate(null));
+    dispatch(setOutboundDate(null));
     Animated.timing(fadeAnim, {
       toValue: 100,
       duration: 300,
@@ -100,8 +108,13 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     return (
       <View style={styles.originContainer}>
         <TextInputWithAutoComplete
+          iconSuccess={faPlaneDeparture}
           input={origin}
-          onFocus={resetPlaces}
+          onFocus={() => {
+            dispatch(setOnboardingQuery('', origin.type));
+            dispatch(setOnboardingValue(null, origin.type));
+            resetPlaces();
+          }}
           onChangeText={val => handleChangeText(val, origin.type)}
           onPressItem={val => handlePressItem(val, origin.type)}
         />
@@ -113,8 +126,13 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
     return (
       <View style={styles.destinationContainer}>
         <TextInputWithAutoComplete
+          iconSuccess={faPlaneArrival}
           input={destination}
-          onFocus={resetPlaces}
+          onFocus={() => {
+            dispatch(setOnboardingQuery('', destination.type));
+            dispatch(setOnboardingValue(null, destination.type));
+            resetPlaces();
+          }}
           onChangeText={val => handleChangeText(val, destination.type)}
           onPressItem={val => handlePressItem(val, destination.type)}
         />
@@ -177,6 +195,7 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
         touchSoundDisabled={false}
         onPress={_e => {
           resetPlaces();
+          Keyboard.dismiss();
         }}>
         <View style={styles.absoluteContainer} />
       </TouchableWithoutFeedback>
@@ -219,7 +238,6 @@ const styles = StyleSheet.create({
   imageStyle: {
     position: 'absolute',
     bottom: 0,
-    borderWidth: 1,
     zIndex: -1,
     width: '100%',
     height: '100%',
@@ -242,7 +260,8 @@ const styles = StyleSheet.create({
   },
   absoluteContainer: {
     zIndex: 0,
-    height: '100%',
+    height: '50%',
+    bottom: 0,
     position: 'absolute',
     width: '100%',
   },

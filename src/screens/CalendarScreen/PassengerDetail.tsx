@@ -263,9 +263,10 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
         />
       );
     } else {
-      const array = Array.from(Array(infants)).map(() => {
+      const array = Array.from(Array(infants)).map((_val, index) => {
         return (
           <FontAwesomeIcon
+            key={index}
             colo
             icon={faChild}
             color={colors.black}
@@ -286,7 +287,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
     const array = Array.from(Array(adults)).map((_v, index) => {
       return (
         <FontAwesomeIcon
-          colo
+          key={index}
           icon={index % 2 === 0 ? faMale : faFemale}
           color={colors.black}
           style={{

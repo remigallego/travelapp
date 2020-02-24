@@ -4,55 +4,42 @@ import {
   TextInputProps,
   Animated,
   ActivityIndicator,
+  Platform,
+  View,
 } from 'react-native';
 import colors from '../../../colors';
 import { TextInput } from 'react-native-gesture-handler';
 import { useAnimation } from 'react-native-animation-hooks';
 import TextMedium from '../../TextMedium';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 interface Props extends TextInputProps {
   loading: boolean;
+  icon: IconDefinition;
+  onFocus: () => void;
 }
 
 const SearchInput: (props: Props) => ReactElement = props => {
-  const valueIsEmpty =
-    props.value === null || props.value === '' || props.value === undefined;
-
-  const colorAnimation = useAnimation({
-    type: 'timing',
-    initialValue: 0,
-    toValue: valueIsEmpty ? 0 : 100,
-    duration: 200,
-  });
-
   return (
-    <Animated.View style={[styles.searchInput, styles.dropShadow, props.style]}>
-      {props.loading ? (
-        <ActivityIndicator style={styles.image} />
-      ) : (
-        <Animated.Image
-          source={require('./glass.png')}
-          style={[
-            styles.image,
-            {
-              // Doesn't work with the debugger on
-              tintColor: colorAnimation.interpolate({
-                inputRange: [0, 100],
-                outputRange: [colors.darkerGrey, colors.blue],
-              }),
-            },
-          ]}
-        />
-      )}
+    <View style={[styles.searchInput, styles.dropShadow, props.style]}>
+      <View style={{ width: 30 }}>
+        {props.loading ? (
+          <ActivityIndicator style={styles.image} color={colors.blue} />
+        ) : (
+          <FontAwesomeIcon icon={props.icon} style={styles.image} />
+        )}
+      </View>
       <TextInput
         {...props}
+        onFocus={props.onFocus}
         autoCorrect={false}
-        selectTextOnFocus
+        selectTextOnFocus={true}
         style={styles.textInput}
         clearTextOnFocus={true}
         placeholderTextColor={colors.darkerGrey}
       />
-    </Animated.View>
+    </View>
   );
 };
 
@@ -75,13 +62,22 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     height: 2,
     width: 2,
+    color: colors.blue,
     resizeMode: 'stretch',
     alignItems: 'center',
   },
   textInput: {
+    marginLeft: 5,
     flex: 1,
     color: colors.blue,
-    marginTop: 14,
+    ...Platform.select({
+      ios: {
+        marginTop: 4,
+      },
+      android: {
+        marginTop: 14,
+      },
+    }),
     fontFamily: 'Poppins-Medium',
     paddingTop: 0,
     fontSize: 14,
@@ -90,10 +86,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 2,
     },
-    shadowOpacity: 0.36,
-    shadowRadius: 6.68,
+    shadowOpacity: 0.16,
+    shadowRadius: 1.68,
     elevation: 10,
   },
 });

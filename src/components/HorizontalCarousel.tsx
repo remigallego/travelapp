@@ -5,6 +5,7 @@ import {
   TextProps,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import colors from '../colors';
 import moment, { Moment } from 'moment';
@@ -49,6 +50,11 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
               styles.bigText,
               {
                 color: isSelected ? colors.grey : colors.black,
+                ...Platform.select({
+                  ios: {
+                    marginTop: 8,
+                  },
+                }),
               },
             ]}>
             {day

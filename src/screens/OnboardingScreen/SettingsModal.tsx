@@ -57,7 +57,7 @@ const SettingsModal = props => {
       <View
         style={{
           position: 'absolute',
-          bottom: 20,
+          bottom: 40,
           right: 20,
         }}>
         <TouchableOpacity
@@ -90,8 +90,8 @@ const SettingsModal = props => {
         <View
           style={{
             position: 'absolute',
-            bottom: 45,
-            right: 45,
+            bottom: 65,
+            right: 55,
           }}>
           <Animated.View
             style={{
@@ -111,6 +111,7 @@ const SettingsModal = props => {
             {CURRENCIES.map(c => {
               return (
                 <TouchableOpacity
+                  key={c.name}
                   onPress={() => {
                     dispatch(setCurrencyToQuery(c.name));
                     Animated.timing(openAnim, {

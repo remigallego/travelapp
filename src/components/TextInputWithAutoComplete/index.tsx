@@ -5,12 +5,14 @@ import { Place } from '../../Backend/types';
 import { StyleSheet } from 'react-native';
 import { InputType, InputState } from '../../reducers/onboardingSearch';
 import { formatPlaceIdAndName } from '../../utils/places';
+import { IconDefinition, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   input: InputState<InputType>;
   onPressItem: (val: Place) => void;
   onChangeText: (val: string) => void;
   onFocus?: () => void;
+  iconSuccess: IconDefinition;
 }
 
 const TextInputWithAutoComplete = (props: Props) => {
@@ -20,7 +22,10 @@ const TextInputWithAutoComplete = (props: Props) => {
         style={styles.searchInputStyle}
         loading={props.input.loading}
         onFocus={props.onFocus}
-        placeholder={props.input.type}
+        placeholder={
+          props.input.type.charAt(0).toUpperCase() + props.input.type.slice(1)
+        }
+        icon={props.input.value ? props.iconSuccess : faSearch}
         value={
           props.input.value
             ? formatPlaceIdAndName(props.input.value)

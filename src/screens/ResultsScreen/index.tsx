@@ -31,16 +31,23 @@ import { useDispatch } from 'react-redux';
 import {
   setOutboundToQuery,
   setInboundToQuery,
-  createSession,
   updateSession,
 } from '../../reducers/query';
-import { toggleSessionLoadingInsideScreen } from '../../reducers/session';
+import {
+  faBackward,
+  faArrowLeft,
+  faChevronLeft,
+  faPlaneArrival,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import TextSemiBold from '../../components/TextSemiBold';
+import TextBold from '../../components/TextBold';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 
-const ResultsScreen: (props: Props) => ReactElement = () => {
+const ResultsScreen: (props: Props) => ReactElement = props => {
   const outboundDate = useSelector(state => state.query.outboundDate);
   const inboundDate = useSelector(state => state.query.inboundDate);
   const [selectedDay, selectDay] = useState(moment(outboundDate));
@@ -100,7 +107,33 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     }
 
     if (itineraries?.length === 0)
-      return <TextMedium style={{ color: 'black' }}>No results...</TextMedium>;
+      return (
+        <View
+          style={{ flex: 1, height: '100%', width: '100%', marginTop: 100 }}>
+          <TextMedium
+            style={{
+              color: 'black',
+              fontSize: 20,
+              paddingHorizontal: 20,
+              lineHeight: 22,
+              textAlign: 'center',
+            }}>
+            Couldn't find any flights matching your query.
+          </TextMedium>
+          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <TextBold
+              style={{
+                color: 'black',
+                fontSize: 24,
+                marginTop: 40,
+                lineHeight: 22,
+                textAlign: 'center',
+              }}>
+              Back
+            </TextBold>
+          </TouchableOpacity>
+        </View>
+      );
 
     const getBadgeType = (index: number) => {
       if (index === 0) {
@@ -149,7 +182,7 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
     const isWithInbound = query.inboundDate !== null;
 
     const inputHeight =
-      results.Itineraries.length <= 5 ? results.Itineraries.length * 40 : 250;
+      results.Itineraries.length <= 5 ? results.Itineraries.length * 30 : 130;
     const maxHeight = isWithInbound ? 180 : 200;
     const minHeight = isWithInbound ? 150 : 100;
     return (
@@ -169,15 +202,26 @@ const ResultsScreen: (props: Props) => ReactElement = () => {
               extrapolate: 'clamp',
             }),
           }}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => ref.scrollTo({ y: 0, animated: true })}>
-            <Headline style={{ paddingHorizontal: 20, paddingBottom: 10 }}>
-              {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
-                query.destinationPlace,
-              )}`}
-            </Headline>
-          </TouchableOpacity>
+          <View
+            style={{
+              flexDirection: 'row',
+              paddingLeft: 20,
+              alignItems: 'center',
+              paddingBottom: 10,
+            }}>
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <FontAwesomeIcon icon={faChevronLeft} size={26} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => ref.scrollTo({ y: 0, animated: true })}>
+              <Headline style={{ paddingLeft: 20, marginTop: 2 }}>
+                {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+                  query.destinationPlace,
+                )}`}
+              </Headline>
+            </TouchableOpacity>
+          </View>
           <HorizontalCarousel
             days={generateDays(outboundDate)}
             selectedDay={moment(outboundDate)}

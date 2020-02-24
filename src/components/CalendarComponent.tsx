@@ -261,10 +261,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 2,
     },
-    shadowOpacity: 1,
-    shadowRadius: 6.68,
+    shadowOpacity: 0.2,
+    shadowRadius: 1.68,
     elevation: 8,
   },
   selectedText: { color: 'white' },

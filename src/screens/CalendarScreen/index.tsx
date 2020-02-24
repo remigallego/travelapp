@@ -1,5 +1,11 @@
-import React, { ReactElement, useState } from 'react';
-import { StyleSheet, View, StatusBar, Animated } from 'react-native';
+import React, { ReactElement, useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  View,
+  StatusBar,
+  Animated,
+  TouchableOpacity,
+} from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CalendarComponent from '../../components/CalendarComponent';
@@ -25,6 +31,8 @@ import {
 } from '../../reducers/query';
 import { ScrollView } from 'react-native-gesture-handler';
 import PassengerDetail from './PassengerDetail';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -92,15 +100,25 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
         <Animated.View
           style={{
             flexDirection: 'row',
-            paddingTop: 5,
             paddingBottom: 5,
             elevation: setScrollBasedElevation(),
             backgroundColor: colors.grey,
           }}>
-          <View style={styles.container}>
-            <Headline>{`${formatPlaceId(origin)} - ${formatPlaceId(
-              destination,
-            )}`}</Headline>
+          <View
+            style={{
+              flexDirection: 'row',
+              paddingLeft: 20,
+              alignItems: 'center',
+              paddingBottom: 10,
+            }}>
+            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+              <FontAwesomeIcon icon={faChevronLeft} size={26} />
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={1}>
+              <Headline style={{ paddingLeft: 20, marginTop: 2 }}>
+                {`${formatPlaceId(origin)} - ${formatPlaceId(destination)}`}
+              </Headline>
+            </TouchableOpacity>
           </View>
         </Animated.View>
         <View style={styles.container}>
@@ -131,7 +149,7 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
         style={[
           {
             position: 'absolute',
-            bottom: 10,
+            bottom: 30,
           },
         ]}
         disabled={outbound === null}
