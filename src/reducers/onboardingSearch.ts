@@ -78,7 +78,7 @@ const SET_ONBOARDING_VALUE = 'SET_ONBOARDING_VALUE';
 const SET_ONBOARDING_PLACES = 'SET_ONBOARDING_PLACES';
 
 const onboardingSearchReducer = (
-  state: OnboardingSearchState = intialStateDEBUG,
+  state: OnboardingSearchState = initialState,
   action: any,
 ) => {
   switch (action.type) {
