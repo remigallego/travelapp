@@ -209,14 +209,8 @@ export const createSession = () => {
     dispatch(setKey(key));
     const results = await Backend.pollSession(key);
 
-    if (results.Itineraries.length !== 0) {
-      dispatch(setResults(results));
-      dispatch(toggleSessionLoading(false));
-    } else {
-      const repollSessionResults = await Backend.pollSession(key);
-      dispatch(setResults(repollSessionResults));
-      dispatch(toggleSessionLoading(false));
-    }
+    dispatch(setResults(results));
+    dispatch(toggleSessionLoading(false));
 
     if (
       results.Status === 'UpdatesPending' &&
@@ -244,10 +238,11 @@ export const pollUntilFinished = () => {
       if (!results.Query.InboundDate) return true;
       return (
         results.Query.InboundDate ===
-        moment(getState().query.outboundDate).format(DATE_FORMAT)
+        moment(getState().query.inboundDate).format(DATE_FORMAT)
       );
     };
 
+  
     if (compareOutbound() && compareInBound()) {
       dispatch(setResults(results));
       if (results.Status === 'UpdatesPending') {
@@ -255,6 +250,8 @@ export const pollUntilFinished = () => {
       } else {
         dispatch(toggleIsFetchingUpdates(false));
       }
+    } else {
+      console.log('different query');
     }
   };
 };

@@ -36,9 +36,10 @@ export default class Backend {
 
   public static pollSession: (
     key: string,
-  ) => Promise<ResultsState> = async key => {
+    retryNumber?: number,
+  ) => Promise<ResultsState> = async (key, retryNumber = 0) => {
     try {
-      console.log('Backend: pollSession');
+      console.log('Backend: pollSession ', retryNumber);
       const response = await fetch(
         `https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/pricing/uk2/v1.0/${key}`,
         {
@@ -51,7 +52,23 @@ export default class Backend {
           },
         },
       );
-      const results = await response.json();
+      const results: ResultsState = await response.json();
+
+      console.log(results);
+      if (results.Status === 'UpdatesComplete') {
+        return results;
+      }
+
+      if (retryNumber === 0) {
+        return await Backend.pollSession(key, retryNumber + 1);
+      }
+
+      if (retryNumber > 0) {
+        if (results.Itineraries.length === 0) {
+          return await Backend.pollSession(key, retryNumber + 1);
+        }
+      }
+
       return results;
     } catch (e) {
       console.log(e);
