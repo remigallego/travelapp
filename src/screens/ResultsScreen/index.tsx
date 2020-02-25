@@ -5,9 +5,7 @@ import {
   StatusBar,
   Linking,
   TouchableOpacity,
-  ActivityIndicator,
   Animated,
-  RefreshControl,
 } from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -33,7 +31,6 @@ import {
   setOutboundToQuery,
   setInboundToQuery,
   recreateSession,
-  updateSession,
 } from '../../reducers/query';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -77,13 +74,16 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
   };
 
   const renderResults = (itineraries: Itinerary[]) => {
-    if (loadingInsideScreen) {
+    if (loadingInsideScreen)
       return (
-        <View style={{ height: '100%', marginTop: 100 }}>
+        <View
+          style={{
+            width: '100%',
+            height: 300,
+          }}>
           <Loading />
         </View>
       );
-    }
 
     if (itineraries?.length === 0)
       return (
@@ -282,7 +282,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
 
           <View style={{ flex: 1, paddingHorizontal: 20 }}>
             {/* {results.Status === 'UpdatesPending' && <Loading />} */}
-            {!loading && renderResults(results.Itineraries.slice(0, 50))}
+            {renderResults(results.Itineraries.slice(0, 50))}
           </View>
         </ScrollView>
       )}
