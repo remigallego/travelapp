@@ -30,6 +30,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
     const isSelected = moment(day).isSame(props.selectedDay, 'day');
     return (
       <TouchableOpacity
+        activeOpacity={0.7}
         onPress={() => props.selectDay(day)}
         style={[
           styles.touchableContainer,

@@ -168,6 +168,7 @@ export const setOnboardingPlaces = (type: InputType) => {
     dispatch: ThunkDispatch<AppState, any, Action>,
     getState: () => AppState,
   ) => {
+    console.log('hfjkdhfjskd');
     dispatch(toggleOnboardingLoading(true, type));
 
     const query = getState().onboardingSearch[type].query;

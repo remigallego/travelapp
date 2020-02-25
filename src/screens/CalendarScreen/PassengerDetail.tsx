@@ -35,6 +35,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
       <Animated.View style={{}}>
         <>
           <TouchableOpacity
+            activeOpacity={0.8}
             onPress={() => {
               // scrollViewRef.scrollTo({ y: 0 });
               Animated.timing(heightAnimation, {
@@ -109,7 +110,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
                   flexDirection: 'row',
                 }}>
                 <TouchableOpacity
-                  activeOpacity={0.7}
+                  activeOpacity={0.8}
                   disabled={adults === 1}
                   onPress={() => props.setAdults(adults - 1)}>
                   <FontAwesomeIcon
@@ -122,7 +123,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  activeOpacity={0.7}
+                  activeOpacity={0.8}
                   disabled={adults === 9}
                   onPress={() => {
                     props.setAdults(adults + 1);
@@ -156,7 +157,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
                   flexDirection: 'row',
                 }}>
                 <TouchableOpacity
-                  activeOpacity={0.7}
+                  activeOpacity={0.8}
                   disabled={!infants}
                   onPress={() => props.setInfants(infants - 1)}>
                   <FontAwesomeIcon
@@ -169,7 +170,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  activeOpacity={0.7}
+                  activeOpacity={0.8}
                   disabled={infants === 9}
                   onPress={() => props.setInfants(infants + 1)}>
                   <FontAwesomeIcon
@@ -193,6 +194,7 @@ const PassengerDetail: (props: Props) => ReactElement = props => {
     opacityAnimation.setValue(0);
     return (
       <TouchableOpacity
+        activeOpacity={0.8}
         onPress={() => {
           Animated.timing(heightAnimation, {
             toValue: isDetailOpen ? 0 : 1,

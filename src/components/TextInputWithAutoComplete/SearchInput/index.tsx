@@ -32,11 +32,11 @@ const SearchInput: (props: Props) => ReactElement = props => {
       </View>
       <TextInput
         {...props}
-        onFocus={props.onFocus}
+        onFocus={() => null}
         autoCorrect={false}
         selectTextOnFocus={true}
         style={styles.textInput}
-        clearTextOnFocus={true}
+        // clearTextOnFocus={true}
         placeholderTextColor={colors.darkerGrey}
       />
     </View>

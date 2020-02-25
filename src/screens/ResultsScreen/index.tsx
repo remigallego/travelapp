@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useEffect } from 'react';
+import React, { ReactElement, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -31,17 +31,12 @@ import { useDispatch } from 'react-redux';
 import {
   setOutboundToQuery,
   setInboundToQuery,
-  updateSession,
+  recreateSession,
 } from '../../reducers/query';
-import {
-  faBackward,
-  faArrowLeft,
-  faChevronLeft,
-  faPlaneArrival,
-} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import TextSemiBold from '../../components/TextSemiBold';
 import TextBold from '../../components/TextBold';
+import Loading from './Loading';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -50,11 +45,19 @@ interface Props {
 const ResultsScreen: (props: Props) => ReactElement = props => {
   const outboundDate = useSelector(state => state.query.outboundDate);
   const inboundDate = useSelector(state => state.query.inboundDate);
-  const [selectedDay, selectDay] = useState(moment(outboundDate));
+  const [, selectDay] = useState(moment(outboundDate));
   const [carouselIsScrolled, setCarouselIsScrolled] = useState(false);
   const [ref, setRef] = useState();
+  const [scrollY] = useState(new Animated.Value(0));
+  const query = useSelector(state => state.query);
+  const loading = useSelector(state => state.session.loading);
+  const loadingInsideScreen = useSelector(
+    state => state.session.loadingInsideScreen,
+  );
+  const results = useSelector(selectResults);
+  const dispatch = useDispatch();
 
-  const [scrollY, setScrollY] = useState(new Animated.Value(0));
+  // useInterval(() => dispatch(updateSession()), 10000);
 
   const generateDays = (date: Date) => {
     return [
@@ -68,40 +71,11 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
     ];
   };
 
-  const query = useSelector(state => state.query);
-
-  const loading = useSelector(state => state.session.loading);
-  const loadingInsideScreen = useSelector(
-    state => state.session.loadingInsideScreen,
-  );
-  const results = useSelector(selectResults);
-
-  const dispatch = useDispatch();
-
-  const renderLoading = () => {
-    return (
-      <View style={{ height: '100%' }}>
-        <ActivityIndicator
-          size={80}
-          color={colors.blue}
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 999,
-          }}
-        />
-      </View>
-    );
-  };
-
   const renderResults = (itineraries: Itinerary[]) => {
     if (loadingInsideScreen) {
       return (
         <View style={{ height: '100%', marginTop: 100 }}>
-          <ActivityIndicator size={70} color={colors.blue}></ActivityIndicator>
+          <Loading />
         </View>
       );
     }
@@ -120,7 +94,9 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
             }}>
             Couldn't find any flights matching your query.
           </TextMedium>
-          <TouchableOpacity onPress={() => props.navigation.goBack()}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => props.navigation.goBack()}>
             <TextBold
               style={{
                 color: 'black',
@@ -158,6 +134,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
             <>
               <View style={{ marginTop: 30 }}>
                 <TouchableOpacity
+                  activeOpacity={0.6}
                   onPress={() => {
                     Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
                   }}>
@@ -209,7 +186,9 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
               alignItems: 'center',
               paddingBottom: 10,
             }}>
-            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => props.navigation.goBack()}>
               <FontAwesomeIcon icon={faChevronLeft} size={26} />
             </TouchableOpacity>
             <TouchableOpacity
@@ -231,7 +210,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
 
               setCarouselIsScrolled(true);
               dispatch(setOutboundToQuery(day.toDate()));
-              dispatch(updateSession());
+              dispatch(recreateSession());
               selectDay(day);
             }}
           />
@@ -244,7 +223,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
               selectDay={day => {
                 if (moment(day.toDate()).isSame(inboundDate)) return;
                 dispatch(setInboundToQuery(day.toDate()));
-                dispatch(updateSession());
+                dispatch(recreateSession());
                 selectDay(day);
               }}
             />
@@ -260,22 +239,24 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
         backgroundColor={colors.backgroundBlue}
         barStyle={'dark-content'}
       />
-      {loading && renderLoading()}
-      <ScrollView
-        ref={r => setRef(r)}
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={0}
-        stickyHeaderIndices={[0]}
-        onScroll={Animated.event([
-          {
-            nativeEvent: { contentOffset: { y: scrollY } },
-          },
-        ])}>
-        {renderHeader()}
-        <View style={{ flex: 1 }}>
-          {!loading && renderResults(results.Itineraries.slice(0, 50))}
-        </View>
-      </ScrollView>
+      {loading && <Loading />}
+      {!loading && (
+        <ScrollView
+          ref={r => setRef(r)}
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={0}
+          stickyHeaderIndices={[0]}
+          onScroll={Animated.event([
+            {
+              nativeEvent: { contentOffset: { y: scrollY } },
+            },
+          ])}>
+          {renderHeader()}
+          <View style={{ flex: 1 }}>
+            {!loading && renderResults(results.Itineraries.slice(0, 50))}
+          </View>
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

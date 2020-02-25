@@ -152,6 +152,7 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
           }
           return (
             <TouchableOpacity
+              disabled={moment(date).isSameOrBefore(moment())}
               key={date.getDate()}
               onPressIn={() => {
                 if (!props.outbound) {
@@ -174,11 +175,12 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
                   handleInboundSelect(null);
                 }
               }}
-              activeOpacity={0.5}
+              activeOpacity={0.7}
               style={[styles.item]}>
               <Animated.View
                 style={[
                   styles.alignCenter,
+
                   isInRange(date)
                     ? {
                         backgroundColor: interpolatedBgColor,
@@ -186,7 +188,14 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
                     : {},
                 ]}>
                 <View style={[styles.numberContainer]}>
-                  <Text key={date.getDate()} style={styles.numberText}>
+                  <Text
+                    key={date.getDate()}
+                    style={[
+                      styles.numberText,
+                      moment(date).isSameOrBefore(moment())
+                        ? { color: colors.lightBlue }
+                        : {},
+                    ]}>
                     {date.getDate().toString()}
                   </Text>
                 </View>

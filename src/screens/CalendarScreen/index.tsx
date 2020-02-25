@@ -90,6 +90,7 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
       <ScrollView
         nestedScrollEnabled={true}
         stickyHeaderIndices={[0]}
+        scrollEventThrottle={10}
         ref={r => setScrollViewRef(r)}
         onScroll={Animated.event([
           {
@@ -111,7 +112,9 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
               alignItems: 'center',
               paddingBottom: 10,
             }}>
-            <TouchableOpacity onPress={() => props.navigation.goBack()}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => props.navigation.goBack()}>
               <FontAwesomeIcon icon={faChevronLeft} size={26} />
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={1}>

@@ -98,6 +98,7 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
 
     return (
       <TouchableOpacity
+        activeOpacity={0.8}
         key={val.PlaceId}
         disabled={isCountry(val) || isCity(val)}
         style={styles.itemContainer}
@@ -139,6 +140,7 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
   return (
     <ScrollView
       keyboardShouldPersistTaps={true}
+      showsVerticalScrollIndicator={true}
       style={[
         styles.container,
         {

@@ -206,13 +206,13 @@ export const createSession = () => {
     };
     const key = await Backend.createSession(craftOptions());
     dispatch(setKey(key));
-    const results = await Backend.pollSession(key);
+    const results = await Backend.pollSession(key, true);
     dispatch(setResults(results));
     dispatch(toggleSessionLoading(false));
   };
 };
 
-export const updateSession = () => {
+export const recreateSession = () => {
   return async (
     dispatch: ThunkDispatch<AppState, any, Action>,
     getState: () => AppState,
@@ -236,9 +236,23 @@ export const updateSession = () => {
     };
     const key = await Backend.createSession(craftOptions());
     dispatch(setKey(key));
-    const results = await Backend.pollSession(key);
+    const results = await Backend.pollSession(key, false);
     dispatch(setResults(results));
     dispatch(toggleSessionLoadingInsideScreen(false));
+  };
+};
+
+export const updateSession = () => {
+  return async (
+    dispatch: ThunkDispatch<AppState, any, Action>,
+    getState: () => AppState,
+  ) => {
+    if (getState().session.loading || getState().session.loadingInsideScreen)
+      return;
+    const key = getState().session.key;
+    const results = await Backend.pollSession(key, false);
+    if (key !== getState().session.key) return;
+    dispatch(setResults(results));
   };
 };
 

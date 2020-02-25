@@ -31,6 +31,7 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
   const renderDate = (date: moment.Moment) => {
     return (
       <TouchableOpacity
+        activeOpacity={0.8}
         key={date.format("MMMM'YY")}
         onPress={() => selectMonth(date.month())}>
         <TextSemiBold style={[{ color: colors.blue }, getDynamicStyle(date)]}>
