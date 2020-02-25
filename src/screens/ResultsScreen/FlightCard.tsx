@@ -33,41 +33,6 @@ const FlightCard = (props: Props) => {
 
   const places = useSelector(state => state.results.Places);
 
-  const renderInbound = () => {
-    if (inboundLeg) {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View style={{ flexDirection: 'column', borderWidth: 1 }}>
-            <TextMedium style={styles.title}>
-              {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
-                query.originPlace,
-              )}`}
-            </TextMedium>
-            <TextMedium style={styles.subTitle}>
-              {moment(inboundLeg.Departure).format('hh:mm A')} -{' '}
-              {moment(inboundLeg.Arrival).format('hh:mm A')}
-            </TextMedium>
-          </View>
-          <View style={{ flexDirection: 'column' }}>
-            <TextMedium style={styles.title}>Time</TextMedium>
-            <TextMedium style={styles.subTitle}>
-              {renderDuration(inboundLeg)}
-            </TextMedium>
-          </View>
-          <View style={{ flexDirection: 'column' }}>
-            <TextMedium style={styles.title}>Transfer</TextMedium>
-            <TextMedium style={styles.subTitle}>-</TextMedium>
-          </View>
-        </View>
-      );
-    }
-    // if(inbound) { ...}
-  };
-
   const renderDuration = (leg: Leg) => {
     // @ts-ignore
     return moment.duration(leg.Duration, 'minutes').format('hh:mm');
@@ -77,7 +42,7 @@ const FlightCard = (props: Props) => {
     if (leg.Stops.length === 0) return '-';
     const firstStopId = leg.Stops[0];
     const firstStop = places.find(pl => pl.Id === firstStopId);
-    return firstStop.Name;
+    return firstStop.Code;
   };
 
   const renderBadge = () => {
@@ -141,7 +106,7 @@ const FlightCard = (props: Props) => {
             />
           </View>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>
               {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
@@ -149,50 +114,60 @@ const FlightCard = (props: Props) => {
               )}`}
             </TextMedium>
             <TextMedium style={styles.subTitle}>
-              {moment(outboundLeg.Departure).format('hh:mm A')} -{' '}
-              {moment(outboundLeg.Arrival).format('hh:mm A')}
+              <>
+                {moment(outboundLeg.Departure).format('hh:mm A')} -{' '}
+                {moment(outboundLeg.Arrival).format('hh:mm A')}
+              </>
             </TextMedium>
-            <TextMedium style={styles.title}>
-              {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
-                query.originPlace,
-              )}`}
-            </TextMedium>
-            <TextMedium style={styles.subTitle}>
-              {moment(inboundLeg.Departure).format('hh:mm A')} -{' '}
-              {moment(inboundLeg.Arrival).format('hh:mm A')}
-            </TextMedium>
+            {inboundLeg && (
+              <>
+                <TextMedium style={styles.title}>
+                  {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
+                    query.originPlace,
+                  )}`}
+                </TextMedium>
+                <TextMedium style={styles.subTitle}>
+                  <>
+                    {moment(inboundLeg.Departure).format('hh:mm A')} -{' '}
+                    {moment(inboundLeg.Arrival).format('hh:mm A')}
+                  </>
+                </TextMedium>
+              </>
+            )}
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Time</TextMedium>
             <TextMedium style={styles.subTitle}>
               {renderDuration(outboundLeg)}
             </TextMedium>
-            <TextMedium style={styles.title}>Time</TextMedium>
-            <TextMedium style={styles.subTitle}>
-              {renderDuration(inboundLeg)}
-            </TextMedium>
+            {inboundLeg && (
+              <>
+                <TextMedium style={styles.title}>Time</TextMedium>
+                <TextMedium style={styles.subTitle}>
+                  {renderDuration(inboundLeg)}
+                </TextMedium>
+              </>
+            )}
           </View>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>Transfer</TextMedium>
-            <TextMedium
-              style={[
-                styles.subTitle,
-                {
-                  width: 100,
-                },
-              ]}>
+            <TextMedium style={[styles.subTitle, {}]}>
               {renderTransfer(outboundLeg)}
             </TextMedium>
-            <TextMedium style={styles.title}>Transfer</TextMedium>
-            <TextMedium
-              style={[
-                styles.subTitle,
-                {
-                  width: 100,
-                },
-              ]}>
-              {renderTransfer(inboundLeg)}
-            </TextMedium>
+            {inboundLeg && (
+              <>
+                <TextMedium style={styles.title}>Transfer</TextMedium>
+                <TextMedium
+                  style={[
+                    styles.subTitle,
+                    {
+                      width: 100,
+                    },
+                  ]}>
+                  {renderTransfer(inboundLeg)}
+                </TextMedium>
+              </>
+            )}
           </View>
         </View>
 
@@ -250,6 +225,6 @@ const styles = StyleSheet.create({
     width: 20,
     backgroundColor: 'black',
   },
-  title: { color: colors.darkerGrey, fontSize: 16, paddingTop: 5 },
-  subTitle: { color: colors.black, fontSize: 16, paddingTop: 5 },
+  title: { color: colors.darkerGrey, fontSize: 14, paddingTop: 5 },
+  subTitle: { color: colors.black, fontSize: 14, paddingTop: 5 },
 });

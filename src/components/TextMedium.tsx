@@ -9,9 +9,9 @@ interface Props extends TextProps {
 const TextMedium: (props: Props) => ReactElement = props => {
   return (
     <Text
-      {...props}
       numberOfLines={1}
       ellipsizeMode={'tail'}
+      {...props}
       style={[styles.text, props.style]}>
       {props.children}
     </Text>

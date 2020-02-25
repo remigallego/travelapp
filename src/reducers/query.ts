@@ -8,6 +8,7 @@ import {
   setKey,
   toggleSessionLoading,
   toggleSessionLoadingInsideScreen,
+  toggleIsFetchingUpdates,
 } from './session';
 import { setResults } from './results';
 import moment from 'moment';
@@ -35,7 +36,7 @@ export interface QueryState {
 
 export const queryInitialState: QueryState = {
   country: 'US',
-  currency: 'EUR',
+  currency: 'USD',
   locale: 'en-US',
   originPlace: null,
   destinationPlace: null,
@@ -207,8 +208,54 @@ export const createSession = () => {
     const key = await Backend.createSession(craftOptions());
     dispatch(setKey(key));
     const results = await Backend.pollSession(key);
-    dispatch(setResults(results));
-    dispatch(toggleSessionLoading(false));
+
+    if (results.Itineraries.length !== 0) {
+      dispatch(setResults(results));
+      dispatch(toggleSessionLoading(false));
+    } else {
+      const repollSessionResults = await Backend.pollSession(key);
+      dispatch(setResults(repollSessionResults));
+      dispatch(toggleSessionLoading(false));
+    }
+
+    if (
+      results.Status === 'UpdatesPending' &&
+      !getState().session.isFetchingUpdates
+    ) {
+      dispatch(toggleIsFetchingUpdates(true));
+      dispatch(pollUntilFinished());
+    }
+  };
+};
+
+export const pollUntilFinished = () => {
+  return async (
+    dispatch: ThunkDispatch<AppState, any, Action>,
+    getState: () => AppState,
+  ) => {
+    const key = getState().session.key;
+    const results = await Backend.pollSession(key);
+
+    const compareOutbound = () =>
+      results.Query.OutboundDate ===
+      moment(getState().query.outboundDate).format(DATE_FORMAT);
+
+    const compareInBound = () => {
+      if (!results.Query.InboundDate) return true;
+      return (
+        results.Query.InboundDate ===
+        moment(getState().query.outboundDate).format(DATE_FORMAT)
+      );
+    };
+
+    if (compareOutbound() && compareInBound()) {
+      dispatch(setResults(results));
+      if (results.Status === 'UpdatesPending') {
+        dispatch(pollUntilFinished());
+      } else {
+        dispatch(toggleIsFetchingUpdates(false));
+      }
+    }
   };
 };
 
@@ -239,6 +286,11 @@ export const recreateSession = () => {
     const results = await Backend.pollSession(key);
     dispatch(setResults(results));
     dispatch(toggleSessionLoadingInsideScreen(false));
+
+    if (results.Status === 'UpdatesPending') {
+      dispatch(toggleIsFetchingUpdates(true));
+      dispatch(pollUntilFinished());
+    }
   };
 };
 

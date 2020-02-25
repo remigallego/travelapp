@@ -1,4 +1,4 @@
-import React, { ReactElement, useState, useCallback } from 'react';
+import React, { ReactElement, useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -37,6 +37,7 @@ import {
   faPlaneArrival,
 } from '@fortawesome/free-solid-svg-icons';
 import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
+import SplashScreen from 'react-native-splash-screen';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -49,6 +50,10 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
   const { origin, destination } = useSelector(state => state.onboardingSearch);
   const [fadeAnim, _s] = useState(new Animated.Value(0));
   const [shouldStartFadeAnim, setStartFadeAnim] = useState(false);
+
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
 
   const debouncedOriginQuery = useCallback(
     _.debounce(() => dispatch(setOnboardingPlaces('origin')), DEBOUNCE_DELAY),

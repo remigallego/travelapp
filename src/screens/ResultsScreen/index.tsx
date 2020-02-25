@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Animated,
+  RefreshControl,
 } from 'react-native';
 import colors from '../../colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,6 +33,7 @@ import {
   setOutboundToQuery,
   setInboundToQuery,
   recreateSession,
+  updateSession,
 } from '../../reducers/query';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -53,6 +55,9 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
   const loading = useSelector(state => state.session.loading);
   const loadingInsideScreen = useSelector(
     state => state.session.loadingInsideScreen,
+  );
+  const isFetchingUpdates = useSelector(
+    state => state.session.isFetchingUpdates,
   );
   const results = useSelector(selectResults);
   const dispatch = useDispatch();
@@ -85,6 +90,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
         <View
           style={{ flex: 1, height: '100%', width: '100%', marginTop: 100 }}>
           <TextMedium
+            numberOfLines={2}
             style={{
               color: 'black',
               fontSize: 20,
@@ -92,7 +98,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
               lineHeight: 22,
               textAlign: 'center',
             }}>
-            Couldn't find any flights matching your query.
+            Sorry, we found no results on these dates.
           </TextMedium>
           <TouchableOpacity
             activeOpacity={0.8}
@@ -120,8 +126,28 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
         } */
       return BadgeType.NONE;
     };
+
+    const renderPrice = item => {
+      const symbol = getCurrencySymbol(results);
+      if (symbol === '$') {
+        return `${symbol}${item.PricingOptions[0]?.Price.toString()}`;
+      }
+      return `${item.PricingOptions[0]?.Price.toString()}${symbol}`;
+    };
     return (
       <FlatList
+        /*  ListHeaderComponent={
+          isFetchingUpdates && (
+            <View
+              style={{
+                height: 100,
+                width: '100%',
+                opacity: 0.6,
+              }}>
+              <Loading />
+            </View>
+          )
+        } */
         data={itineraries}
         renderItem={({ item, index }) => {
           const outboundLeg = results.Legs.find(
@@ -139,9 +165,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
                     Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
                   }}>
                   <FlightCard
-                    price={`${item.PricingOptions[0]?.Price.toString()}${getCurrencySymbol(
-                      results,
-                    )}`}
+                    price={renderPrice(item)}
                     badgeType={getBadgeType(index)}
                     outboundLeg={outboundLeg}
                     inboundLeg={inboundLeg}
@@ -173,11 +197,14 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
               outputRange: [0, 10],
               extrapolate: 'clamp',
             }),
-            height: scrollY.interpolate({
-              inputRange: [0, inputHeight],
-              outputRange: [maxHeight, minHeight],
-              extrapolate: 'clamp',
-            }),
+            height:
+              results.Itineraries.length < 3
+                ? 200
+                : scrollY.interpolate({
+                    inputRange: [0, inputHeight],
+                    outputRange: [maxHeight, minHeight],
+                    extrapolate: 'clamp',
+                  }),
           }}>
           <View
             style={{
@@ -252,7 +279,9 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
             },
           ])}>
           {renderHeader()}
-          <View style={{ flex: 1 }}>
+
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            {/* {results.Status === 'UpdatesPending' && <Loading />} */}
             {!loading && renderResults(results.Itineraries.slice(0, 50))}
           </View>
         </ScrollView>

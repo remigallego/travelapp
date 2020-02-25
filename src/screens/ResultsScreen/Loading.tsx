@@ -6,7 +6,9 @@ import useInterval from '@use-it/interval';
 
 import Spinner from 'react-native-spinkit';
 
-const Loading = () => {
+interface Props {}
+
+const Loading = (props: Props) => {
   const phrases = [
     'Loading the best prices',
     'We are comparing flights',
@@ -75,7 +77,8 @@ const Loading = () => {
           style={{
             opacity: opacityAnim,
           }}>
-          <TextSemiBold style={{ color: colors.blue, fontSize: 18 }}>
+          <TextSemiBold
+            style={{ color: colors.blue, fontSize: 18, opacity: 1 }}>
             {currentPhrase}
           </TextSemiBold>
         </Animated.View>

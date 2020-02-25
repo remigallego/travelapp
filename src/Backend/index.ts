@@ -52,12 +52,7 @@ export default class Backend {
         },
       );
       const results = await response.json();
-      console.log(results);
-      if (results.Status === 'UpdatesPending') {
-        return await Backend.pollSession(key);
-      } else {
-        return results;
-      }
+      return results;
     } catch (e) {
       console.log(e);
     }

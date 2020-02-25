@@ -114,7 +114,10 @@ const CalendarScreen: (props: Props) => ReactElement = props => {
             }}>
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => props.navigation.goBack()}>
+              onPress={() => {
+                StatusBar.setBarStyle('light-content');
+                props.navigation.goBack();
+              }}>
               <FontAwesomeIcon icon={faChevronLeft} size={26} />
             </TouchableOpacity>
             <TouchableOpacity activeOpacity={1}>
