@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Place, SessionsOpts } from './types';
 import qs from 'qs';
+import { ResultsState } from '../reducers/results';
 
 const endpoint =
   'https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com';
@@ -14,9 +15,10 @@ export default class Backend {
     try {
       console.log('Backend: createSession');
       console.log(opts);
-      const response = await axios.post(
+      const response = await fetch(
         'https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/pricing/v1.0',
         {
+          method: 'POST',
           headers: {
             'x-rapidapi-host':
               'skyscanner-skyscanner-flight-search-v1.p.rapidapi.com',
@@ -29,15 +31,15 @@ export default class Backend {
       const location = response.headers.get('location');
       const key = location.split('/').pop();
       return key;
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
 
-  public static pollSession = async (key: string, recursive: boolean) => {
+  public static pollSession: (
+    key: string,
+  ) => Promise<ResultsState> = async key => {
     try {
       console.log('Backend: pollSession');
-      const response = await axios.get(
+      const response = await fetch(
         `https://skyscanner-skyscanner-flight-search-v1.p.rapidapi.com/apiservices/pricing/uk2/v1.0/${key}`,
         {
           method: 'GET',
@@ -51,13 +53,11 @@ export default class Backend {
       );
       const results = await response.json();
       console.log(results);
-      if (recursive) {
-        if (results.Status === 'UpdatesPending') {
-          return await Backend.pollSession(key, true);
-        } else {
-          return results;
-        }
-      } else return results;
+      if (results.Status === 'UpdatesPending') {
+        return await Backend.pollSession(key);
+      } else {
+        return results;
+      }
     } catch (e) {
       console.log(e);
     }

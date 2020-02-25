@@ -7,7 +7,15 @@ interface Props extends TextProps {
 }
 
 const TextMedium: (props: Props) => ReactElement = props => {
-  return <Text style={[styles.text, props.style]}>{props.children}</Text>;
+  return (
+    <Text
+      {...props}
+      numberOfLines={1}
+      ellipsizeMode={'tail'}
+      style={[styles.text, props.style]}>
+      {props.children}
+    </Text>
+  );
 };
 
 export default TextMedium;

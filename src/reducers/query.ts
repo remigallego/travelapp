@@ -206,7 +206,7 @@ export const createSession = () => {
     };
     const key = await Backend.createSession(craftOptions());
     dispatch(setKey(key));
-    const results = await Backend.pollSession(key, true);
+    const results = await Backend.pollSession(key);
     dispatch(setResults(results));
     dispatch(toggleSessionLoading(false));
   };
@@ -236,7 +236,7 @@ export const recreateSession = () => {
     };
     const key = await Backend.createSession(craftOptions());
     dispatch(setKey(key));
-    const results = await Backend.pollSession(key, false);
+    const results = await Backend.pollSession(key);
     dispatch(setResults(results));
     dispatch(toggleSessionLoadingInsideScreen(false));
   };
@@ -250,7 +250,7 @@ export const updateSession = () => {
     if (getState().session.loading || getState().session.loadingInsideScreen)
       return;
     const key = getState().session.key;
-    const results = await Backend.pollSession(key, false);
+    const results = await Backend.pollSession(key);
     if (key !== getState().session.key) return;
     dispatch(setResults(results));
   };

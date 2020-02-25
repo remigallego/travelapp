@@ -31,11 +31,17 @@ const FlightCard = (props: Props) => {
     return state.results.Carriers.find(c => c.Id === id);
   });
 
+  const places = useSelector(state => state.results.Places);
+
   const renderInbound = () => {
     if (inboundLeg) {
       return (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'column' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <View style={{ flexDirection: 'column', borderWidth: 1 }}>
             <TextMedium style={styles.title}>
               {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
                 query.originPlace,
@@ -64,7 +70,14 @@ const FlightCard = (props: Props) => {
 
   const renderDuration = (leg: Leg) => {
     // @ts-ignore
-    return moment.duration(leg.Duration, 'minutes').format('hh:m');
+    return moment.duration(leg.Duration, 'minutes').format('hh:mm');
+  };
+
+  const renderTransfer = (leg: Leg) => {
+    if (leg.Stops.length === 0) return '-';
+    const firstStopId = leg.Stops[0];
+    const firstStop = places.find(pl => pl.Id === firstStopId);
+    return firstStop.Name;
   };
 
   const renderBadge = () => {
@@ -128,8 +141,62 @@ const FlightCard = (props: Props) => {
             />
           </View>
         </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>
+              {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
+                query.destinationPlace,
+              )}`}
+            </TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {moment(outboundLeg.Departure).format('hh:mm A')} -{' '}
+              {moment(outboundLeg.Arrival).format('hh:mm A')}
+            </TextMedium>
+            <TextMedium style={styles.title}>
+              {`${formatPlaceId(query.destinationPlace)} - ${formatPlaceId(
+                query.originPlace,
+              )}`}
+            </TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {moment(inboundLeg.Departure).format('hh:mm A')} -{' '}
+              {moment(inboundLeg.Arrival).format('hh:mm A')}
+            </TextMedium>
+          </View>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>Time</TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {renderDuration(outboundLeg)}
+            </TextMedium>
+            <TextMedium style={styles.title}>Time</TextMedium>
+            <TextMedium style={styles.subTitle}>
+              {renderDuration(inboundLeg)}
+            </TextMedium>
+          </View>
+          <View style={{ flexDirection: 'column' }}>
+            <TextMedium style={styles.title}>Transfer</TextMedium>
+            <TextMedium
+              style={[
+                styles.subTitle,
+                {
+                  width: 100,
+                },
+              ]}>
+              {renderTransfer(outboundLeg)}
+            </TextMedium>
+            <TextMedium style={styles.title}>Transfer</TextMedium>
+            <TextMedium
+              style={[
+                styles.subTitle,
+                {
+                  width: 100,
+                },
+              ]}>
+              {renderTransfer(inboundLeg)}
+            </TextMedium>
+          </View>
+        </View>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        {/*  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'column' }}>
             <TextMedium style={styles.title}>
               {`${formatPlaceId(query.originPlace)} - ${formatPlaceId(
@@ -153,7 +220,7 @@ const FlightCard = (props: Props) => {
           </View>
         </View>
 
-        {renderInbound()}
+        {renderInbound()} */}
       </View>
     </Card>
   );

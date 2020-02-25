@@ -1,4 +1,4 @@
-import { View, ActivityIndicator, Animated } from 'react-native';
+import { View, Animated } from 'react-native';
 import React, { useState } from 'react';
 import colors from '../../colors';
 import TextSemiBold from '../../components/TextSemiBold';
