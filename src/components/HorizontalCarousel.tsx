@@ -42,6 +42,7 @@ const HorizontalCarousel: (props: Props) => ReactElement = props => {
         <View
           style={[
             styles.textContainer,
+
             {
               backgroundColor: isSelected ? colors.blue : colors.white,
             },

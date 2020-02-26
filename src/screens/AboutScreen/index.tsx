@@ -12,13 +12,13 @@ import {
   NavigationScreenProp,
   NavigationState,
   NavigationParams,
-  SafeAreaView,
 } from 'react-navigation';
 import Headline from '../../components/Headline';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import TextSemiBold from '../../components/TextSemiBold';
 import TextBold from '../../components/TextBold';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface Props {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -48,7 +48,6 @@ const AboutScreen: (props: Props) => ReactElement = props => {
         </TouchableOpacity>
         <Headline style={{ paddingLeft: 20, marginTop: 2 }}>About</Headline>
       </View>
-
       <View
         style={{
           flex: 1,
@@ -57,7 +56,7 @@ const AboutScreen: (props: Props) => ReactElement = props => {
           alignItems: 'center',
         }}>
         <TextSemiBold style={styles.createdText}>
-          Created with 💙 by Rémi Gallego
+          {'Programmed with 💙 by\nRémi Gallego'}
         </TextSemiBold>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -81,6 +80,22 @@ const AboutScreen: (props: Props) => ReactElement = props => {
               Linking.openURL('https://twitter.com/The_Algorithm')
             }>
             <Image source={require('./twitter.png')} style={styles.social} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={{
+            paddingHorizontal: 20,
+            alignItems: 'center',
+            marginTop: 60,
+          }}>
+          <TextSemiBold style={[styles.createdText]}>
+            Design by Dasha Malvo
+          </TextSemiBold>
+          <TouchableOpacity
+            style={{ marginTop: 20 }}
+            activeOpacity={0.8}
+            onPress={() => Linking.openURL('https://dribbble.com/DashaMalvo')}>
+            <Image source={require('./dribbble.png')} style={styles.social} />
           </TouchableOpacity>
         </View>
       </View>

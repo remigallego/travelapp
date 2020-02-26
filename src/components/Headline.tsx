@@ -1,7 +1,8 @@
 import React, { ReactElement } from 'react';
-import { StyleSheet, TextStyle, StyleProp } from 'react-native';
+import { StyleSheet, TextStyle, StyleProp, View } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import TextSemiBold from '../components/TextSemiBold';
+import colors from '../colors';
 
 interface Props {
   children: string | ReactElement | ReactElement[];
@@ -10,9 +11,12 @@ interface Props {
 
 const Headline: (props: Props) => ReactElement = props => {
   return (
-    <TextSemiBold style={[styles.blackText, styles.bigText, props.style]}>
-      {props.children}
-    </TextSemiBold>
+    <View style={props.style}>
+      <TextSemiBold style={[styles.blackText, styles.bigText]}>
+        {props.children}
+      </TextSemiBold>
+      <View style={{ backgroundColor: colors.pink, width: 30, height: 3 }} />
+    </View>
   );
 };
 

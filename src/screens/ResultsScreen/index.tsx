@@ -22,7 +22,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FlightCard, { BadgeType } from './FlightCard';
 import { useSelector } from '../../store';
 import TextMedium from '../../components/TextMedium';
-import { getCurrencySymbol } from '../../utils/results';
+import { getCurrencySymbol, findFastestItineraries } from '../../utils/results';
 import { formatPlaceId } from '../../utils/places';
 import { selectResults } from '../../reducers/results';
 import { Itinerary } from '../../Backend/types';
@@ -117,15 +117,7 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
         </View>
       );
 
-    const getBadgeType = (index: number) => {
-      if (index === 0) {
-        return BadgeType.CHEAPEST;
-      }
-      /*   if (itinerary.OutboundLegId === fastestId) {
-          return BadgeType.FASTEST;
-        } */
-      return BadgeType.NONE;
-    };
+    const fastestItinerary = findFastestItineraries(itineraries, results.Legs);
 
     const renderPrice = item => {
       const symbol = getCurrencySymbol(results);
@@ -135,47 +127,79 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
       return `${item.PricingOptions[0]?.Price.toString()}${symbol}`;
     };
     return (
-      <FlatList
-        /*  ListHeaderComponent={
-          isFetchingUpdates && (
-            <View
-              style={{
-                height: 100,
-                width: '100%',
-                opacity: 0.6,
-              }}>
-              <Loading />
+      <>
+        {
+          <>
+            <View style={{ marginTop: 30 }}>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => {
+                  Linking.openURL(itineraries[0].PricingOptions[0].DeeplinkUrl);
+                }}>
+                <FlightCard
+                  price={renderPrice(itineraries[0])}
+                  badgeType={BadgeType.CHEAPEST}
+                  outboundLeg={results.Legs.find(
+                    val => val.Id === itineraries[0].OutboundLegId,
+                  )}
+                  inboundLeg={results.Legs.find(
+                    val => val.Id === itineraries[0].InboundLegId,
+                  )}
+                />
+              </TouchableOpacity>
             </View>
-          )
-        } */
-        data={itineraries}
-        renderItem={({ item, index }) => {
-          const outboundLeg = results.Legs.find(
-            val => val.Id === item.OutboundLegId,
-          );
-          const inboundLeg = results.Legs.find(
-            val => val.Id === item.InboundLegId,
-          );
-          return (
-            <>
-              <View style={{ marginTop: 30 }}>
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  onPress={() => {
-                    Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
-                  }}>
-                  <FlightCard
-                    price={renderPrice(item)}
-                    badgeType={getBadgeType(index)}
-                    outboundLeg={outboundLeg}
-                    inboundLeg={inboundLeg}
-                  />
-                </TouchableOpacity>
-              </View>
-            </>
-          );
-        }}
-      />
+            <View style={{ marginTop: 40 }}>
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => {
+                  Linking.openURL(
+                    fastestItinerary.PricingOptions[0].DeeplinkUrl,
+                  );
+                }}>
+                <FlightCard
+                  price={renderPrice(fastestItinerary)}
+                  badgeType={BadgeType.FASTEST}
+                  outboundLeg={results.Legs.find(
+                    val => val.Id === fastestItinerary.OutboundLegId,
+                  )}
+                  inboundLeg={results.Legs.find(
+                    val => val.Id === fastestItinerary.InboundLegId,
+                  )}
+                />
+              </TouchableOpacity>
+            </View>
+          </>
+        }
+        <FlatList
+          data={itineraries.slice(1)}
+          renderItem={({ item, index }) => {
+            const outboundLeg = results.Legs.find(
+              val => val.Id === item.OutboundLegId,
+            );
+            const inboundLeg = results.Legs.find(
+              val => val.Id === item.InboundLegId,
+            );
+            return (
+              <>
+                <View style={{ marginTop: 30 }}>
+                  <TouchableOpacity
+                    activeOpacity={0.6}
+                    onPress={() => {
+                      Linking.openURL(item.PricingOptions[0].DeeplinkUrl);
+                    }}>
+                    <FlightCard
+                      price={renderPrice(item)}
+                      badgeType={BadgeType.NONE}
+                      outboundLeg={outboundLeg}
+                      inboundLeg={inboundLeg}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </>
+            );
+          }}
+        />
+      </>
     );
   };
 

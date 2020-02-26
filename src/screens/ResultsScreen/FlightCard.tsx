@@ -9,6 +9,7 @@ import moment from 'moment';
 import { useSelector } from '../../store';
 import { formatPlaceId } from '../../utils/places';
 import 'moment-duration-format';
+import TextBold from '../../components/TextBold';
 export enum BadgeType {
   CHEAPEST,
   FASTEST,
@@ -96,13 +97,19 @@ const FlightCard = (props: Props) => {
       {renderBadge()}
       <View style={{ flexDirection: 'column' }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <TextMedium style={[styles.blackText, { fontSize: 24 }]}>
+          <TextBold style={[styles.blackText, { fontSize: 30 }]}>
             {props.price}
-          </TextMedium>
-          <View style={{ flexDirection: 'row' }}>
+          </TextBold>
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
             <Image
               source={{ uri: carrier.ImageUrl }}
-              style={{ width: 50, resizeMode: 'contain' }}
+              style={{
+                width: 50,
+                resizeMode: 'contain',
+              }}
             />
           </View>
         </View>
@@ -206,9 +213,9 @@ export default FlightCard;
 const styles = StyleSheet.create({
   badge: {
     paddingTop: 0,
-    paddingBottom: 5,
+    paddingBottom: 2,
     paddingHorizontal: 10,
-    width: 120,
+    width: 100,
     position: 'absolute',
     top: -20,
     left: 35,
@@ -216,8 +223,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeText: {
-    fontSize: 15,
-    paddingTop: 15,
+    fontSize: 13,
+    paddingTop: 10,
   },
   blackText: { color: colors.black },
   iconPlaceholder: {
