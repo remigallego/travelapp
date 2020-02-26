@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   Animated,
   Keyboard,
+  TouchableOpacity,
 } from 'react-native';
 import colors from '../../colors';
 import TextLight from '../../components/TextLight';
@@ -38,6 +39,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { setInboundDate, setOutboundDate } from '../../reducers/calendar';
 import SplashScreen from 'react-native-splash-screen';
+import TextSemiBold from '../../components/TextSemiBold';
 
 const DEBOUNCE_DELAY = 500;
 
@@ -206,6 +208,24 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
       </TouchableWithoutFeedback>
 
       <SettingsModal />
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 35,
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => {
+            props.navigation.navigate('About');
+          }}>
+          <TextSemiBold style={{ fontSize: 16, color: colors.blue }}>
+            About this app
+          </TextSemiBold>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
