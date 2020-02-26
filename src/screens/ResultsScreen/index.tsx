@@ -192,6 +192,17 @@ const ResultsScreen: (props: Props) => ReactElement = props => {
           style={{
             backgroundColor: colors.grey,
             paddingBottom: 10,
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 2,
+            },
+            shadowOpacity: scrollY.interpolate({
+              inputRange: [0, inputHeight],
+              outputRange: [0, 0.2],
+              extrapolate: 'clamp',
+            }),
+            shadowRadius: 10,
             elevation: scrollY.interpolate({
               inputRange: [0, inputHeight],
               outputRange: [0, 10],
