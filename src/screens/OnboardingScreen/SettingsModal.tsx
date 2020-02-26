@@ -59,6 +59,7 @@ const SettingsModal = props => {
           position: 'absolute',
           bottom: 40,
           right: 20,
+          zIndex: 4444,
         }}>
         <TouchableOpacity
           onPress={() => {
