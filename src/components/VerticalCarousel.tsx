@@ -13,8 +13,8 @@ import moment, { Moment } from 'moment';
 
 interface Props extends TextProps {
   months: moment.Moment[];
-  selectedMonth: number;
-  selectMonth: (m: number) => void;
+  selectedMonth: moment.Moment;
+  selectMonth: (m: moment.Moment) => void;
 }
 
 const VerticalCarousel: (props: Props) => ReactElement = props => {
@@ -22,9 +22,9 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
 
   const getDynamicStyle = (date: moment.Moment) => {
     return {
-      lineHeight: selectedMonth === date.month() ? 24 : 18,
-      fontSize: selectedMonth === date.month() ? 30 : 24,
-      opacity: selectedMonth === date.month() ? 1 : 0.4,
+      lineHeight: selectedMonth.month() === date.month() ? 24 : 18,
+      fontSize: selectedMonth.month() === date.month() ? 30 : 24,
+      opacity: selectedMonth.month() === date.month() ? 1 : 0.4,
     };
   };
 
@@ -33,7 +33,7 @@ const VerticalCarousel: (props: Props) => ReactElement = props => {
       <TouchableOpacity
         activeOpacity={0.8}
         key={date.format("MMMM'YY")}
-        onPress={() => selectMonth(date.month())}>
+        onPress={() => selectMonth(date)}>
         <TextSemiBold style={[{ color: colors.blue }, getDynamicStyle(date)]}>
           {`${date.format("MMMM'YY")}`}
         </TextSemiBold>

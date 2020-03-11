@@ -14,7 +14,7 @@ import TextMedium from './TextMedium';
 import moment from 'moment';
 
 interface Props extends ViewProps {
-  month: number;
+  month: moment.Moment;
   inbound: Date;
   outbound: Date;
   onInboundSelect: (inbound: Date) => void;
@@ -53,11 +53,11 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
 
   const renderNumbers: () => ReactElement = () => {
     const numberOfDays = moment()
-      .month(props.month)
+      .month(props.month.month())
       .daysInMonth();
 
     const firstDayOfMonth = moment()
-      .month(props.month)
+      .month(props.month.month())
       .startOf('month')
       .weekday(); // 6 = saturday, 0 = sunday
 
@@ -67,7 +67,8 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
 
     const arrayOfDates = Array.from(Array(numberOfDays).keys()).map(n => {
       return moment()
-        .month(props.month)
+        .month(props.month.month())
+        .year(props.month.year())
         .date(n + 1)
         .startOf('day')
         .toDate();
@@ -139,6 +140,8 @@ const CalendarComponent: (props: Props) => ReactElement = props => {
         </TouchableOpacity>
       );
     };
+
+    console.log('arrayOfDates ===', arrayOfDates);
 
     return (
       <View style={styles.numbersFullContainer}>

@@ -39,11 +39,9 @@ interface Props {
 }
 
 const CalendarScreen: (props: Props) => ReactElement = props => {
-  const [selectedMonth, selectMonth] = useState(
-    moment()
-      .add('1', 'month')
-      .month(),
-  );
+  const [selectedMonth, selectMonth] = useState(moment().add('1', 'month'));
+
+  console.log('selectedMonth ===', moment().add('1', 'month'));
 
   const [scrollY] = useState(new Animated.Value(0));
   const [, setScrollViewRef] = useState(null);
