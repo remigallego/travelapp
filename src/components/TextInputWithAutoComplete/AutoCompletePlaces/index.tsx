@@ -6,6 +6,7 @@ import {
   ScrollView,
   Animated,
   Keyboard,
+  Platform,
 } from 'react-native';
 import TextLight from '../../TextLight';
 import colors from '../../../colors';
@@ -148,10 +149,10 @@ const AutoCompletePlaces: (props: Props) => ReactElement = props => {
         },
       ]}>
       {!props.loading && (
-        <>
+        <View style={{ paddingBottom: 10 }}>
           {cities.map(renderAirportOfThisCity)}
           {airportsNotIncludedInACity.map(renderAirport)}
-        </>
+        </View>
       )}
     </ScrollView>
   );
@@ -184,9 +185,13 @@ const styles = StyleSheet.create({
   itemText: {
     color: 'black',
     fontSize: 16,
-    marginBottom: 15,
     marginLeft: 10,
     lineHeight: 1,
+    ...Platform.select({
+      android: {
+        marginBottom: 6,
+      },
+    }),
   },
   icon: {
     marginLeft: 10,

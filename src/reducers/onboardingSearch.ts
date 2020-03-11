@@ -151,9 +151,13 @@ export const setOnboardingQuery = (query: string, type: InputType) => (
 };
 
 export const setOnboardingValue = (value: Place, type: InputType) => {
-  return (dispatch: ThunkDispatch<AppState, any, Action>) => {
+  return (
+    dispatch: ThunkDispatch<AppState, any, Action>,
+    getState: () => AppState,
+  ) => {
     dispatch(resetOnboardingPlaces(type));
-    return dispatch({
+
+    dispatch({
       type: SET_ONBOARDING_VALUE,
       payload: {
         value,
@@ -168,11 +172,16 @@ export const setOnboardingPlaces = (type: InputType) => {
     dispatch: ThunkDispatch<AppState, any, Action>,
     getState: () => AppState,
   ) => {
-    console.log('hfjkdhfjskd');
     dispatch(toggleOnboardingLoading(true, type));
 
     const query = getState().onboardingSearch[type].query;
-    const places = await Backend.getPlaces(query);
+    const otherType = getOtherType(type);
+    let places = await Backend.getPlaces(query);
+    if (getState().onboardingSearch[otherType].value) {
+      places = places.filter(
+        pl => getState().onboardingSearch[otherType].value.CityId !== pl.CityId,
+      );
+    }
 
     dispatch({
       type: SET_ONBOARDING_PLACES,
@@ -193,5 +202,8 @@ export const resetOnboardingPlaces = (type: InputType) => ({
     type,
   },
 });
+
+export const getOtherType = (type: InputType) =>
+  type === 'destination' ? 'origin' : 'destination';
 
 export default onboardingSearchReducer;

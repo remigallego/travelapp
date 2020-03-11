@@ -118,9 +118,10 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
           iconSuccess={faPlaneDeparture}
           input={origin}
           onFocus={() => {
-            dispatch(setOnboardingQuery('', origin.type));
-            dispatch(setOnboardingValue(null, origin.type));
             resetPlaces();
+            if (origin.query) {
+              handleChangeText(origin.query, origin.type);
+            }
           }}
           onChangeText={val => handleChangeText(val, origin.type)}
           onPressItem={val => handlePressItem(val, origin.type)}
@@ -136,9 +137,10 @@ const OnboardingScreen: (props: Props) => ReactElement = props => {
           iconSuccess={faPlaneArrival}
           input={destination}
           onFocus={() => {
-            dispatch(setOnboardingQuery('', destination.type));
-            dispatch(setOnboardingValue(null, destination.type));
             resetPlaces();
+            if (destination.query) {
+              handleChangeText(destination.query, destination.type);
+            }
           }}
           onChangeText={val => handleChangeText(val, destination.type)}
           onPressItem={val => handlePressItem(val, destination.type)}
